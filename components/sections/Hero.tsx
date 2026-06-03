@@ -1,13 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
-
-const GridBackground = dynamic(
-  () => import('@/components/ui/GridBackground'),
-  { ssr: false },
-)
 
 const LINE1 = 'Twoja firma.'
 const LINE2 = 'Zautomatyzowana.'
@@ -58,23 +52,40 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex items-center overflow-hidden terminal-grid"
+      className="relative flex items-center overflow-hidden"
       style={{ minHeight: '100vh', backgroundColor: '#0A0A0A' }}
       aria-label="Hero"
     >
-      <GridBackground />
-
-      {/* Radial vignette */}
-      <div
-        className="absolute inset-0 z-[1]"
+      {/* Video background */}
+      <video
+        src="/videos/hero.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
         style={{
-          background:
-            'radial-gradient(ellipse 90% 70% at 50% 50%, rgba(10,10,10,0.15) 0%, rgba(10,10,10,0.88) 100%)',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: 0.6,
+          zIndex: 0,
+        }}
+      />
+
+      {/* Dark overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'rgba(10,10,10,0.5)',
+          zIndex: 1,
         }}
       />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto w-full px-6 pt-32 pb-24">
+      <div className="relative z-[2] max-w-6xl mx-auto w-full px-6 pt-32 pb-24">
         {/* Tag */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -230,7 +241,7 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[2]"
         initial={{ opacity: 0 }}
         animate={{ opacity: showCTA ? 0.5 : 0 }}
         transition={{ delay: 0.6, duration: 0.6 }}
