@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
 
 const LINE1 = 'Twoja firma.'
@@ -13,6 +13,13 @@ export default function Hero() {
   const [text1, setText1] = useState('')
   const [text2, setText2] = useState('')
   const [phase, setPhase] = useState<Phase>('line1')
+
+  const { scrollY } = useScroll()
+  const videoY = useTransform(scrollY, [0, 800], ['0%', '30%'])
+  const videoScale = useTransform(scrollY, [0, 800], [1, 1.1])
+  const overlayOpacity = useTransform(scrollY, [0, 400], [0.5, 0.85])
+  const textY = useTransform(scrollY, [0, 400], ['0%', '15%'])
+  const textOpacity = useTransform(scrollY, [0, 300], [1, 0])
 
   /* typewriter — line 1 */
   useEffect(() => {
@@ -52,40 +59,43 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex items-center overflow-hidden"
-      style={{ minHeight: '100vh', backgroundColor: '#0A0A0A' }}
+      className="relative flex items-center"
+      style={{ minHeight: '100vh', backgroundColor: '#0A0A0A', overflow: 'hidden' }}
       aria-label="Hero"
     >
-      {/* Video background */}
-      <video
-        src="/videos/hero.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          opacity: 0.6,
-          zIndex: 0,
-        }}
-      />
+      {/* Video wrapper — overflow:hidden clips the parallax overshoot */}
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
+        <motion.video
+          src="/videos/hero.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            y: videoY,
+            scale: videoScale,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: 0.6,
+          }}
+        />
+      </div>
 
-      {/* Dark overlay */}
-      <div
+      {/* Dark overlay — darkens as user scrolls */}
+      <motion.div
         className="absolute inset-0"
-        style={{
-          background: 'rgba(10,10,10,0.5)',
-          zIndex: 1,
-        }}
+        style={{ background: 'rgb(10,10,10)', opacity: overlayOpacity, zIndex: 1 }}
       />
 
-      {/* Content */}
-      <div className="relative z-[2] max-w-6xl mx-auto w-full px-6 pt-32 pb-24">
+      {/* Content — fades and drifts up on scroll */}
+      <motion.div
+        className="relative z-[2] max-w-6xl mx-auto w-full px-6 pt-32 pb-24"
+        style={{ y: textY, opacity: textOpacity }}
+      >
         {/* Tag */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -237,7 +247,7 @@ export default function Hero() {
             </div>
           ))}
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* Scroll indicator */}
       <motion.div
