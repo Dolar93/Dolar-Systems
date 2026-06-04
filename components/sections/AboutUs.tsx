@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { Reveal } from '@/components/animations/reveal'
@@ -7,21 +8,25 @@ import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
 const TEAM = [
   {
     photo: '/bartosz.png',
-    initials: 'BD',
     name: 'Bartosz "Dolar" Dolczewski',
     role: 'Architekt Automatyzacji · Założyciel',
     bio: 'Buduję systemy AI które zastępują powtarzalną pracę. Stack: Node.js, Make.com, n8n, Claude AI, PostgreSQL. Każde wdrożenie traktuję jak projekt inżynierski — najpierw architektura, potem kod.',
     badges: ['Node.js', 'Make.com', 'n8n', 'Claude AI', 'PostgreSQL', 'Railway'],
-    accentBg: '#D4E4C8', accentBgRgb: '212,228,200', accentDark: '#4A7A3A',
+    accentBg:    '#D4E4C8',
+    accentBgRgb: '212,228,200',
+    accentDark:  '#4A7A3A',
+    darkRgb:     '74,122,58',
   },
   {
     photo: '/marek.png',
-    initials: 'MR',
     name: 'Marek Rybka',
     role: 'Head of Business · Co-Founder',
     bio: 'Head w AppChance — firma z portfolio aplikacji mobilnych dla klientów B2B. Doświadczenie w sprzedaży enterprise, kontakty w branży IT i prawnej. Ogarnia biznes żebym ja mógł ogarniać kod.',
     badges: ['B2B Sales', 'AppChance', 'Mobile Apps', 'Enterprise'],
-    accentBg: '#F2D4C8', accentBgRgb: '242,212,200', accentDark: '#8B4A35',
+    accentBg:    '#F2D4C8',
+    accentBgRgb: '242,212,200',
+    accentDark:  '#8B4A35',
+    darkRgb:     '139,74,53',
   },
 ]
 
@@ -38,99 +43,112 @@ const COLLAGE = [
   { bg: '#D4C8E8', w: 100, h: 130, rot: 12,  style: { right: '10px', bottom: '30px' } as React.CSSProperties },
 ]
 
+/* ── Team card — dissolving edges on hover, no fold ───────────── */
 function TeamCard({ member, index }: { member: typeof TEAM[number]; index: number }) {
-  const { hovered, ref: cardRef, handlers } = useCardFold()
+  const [hovered, setHovered] = useState(false)
 
   return (
     <Reveal delay={index * 0.15}>
-      <div style={{ position: 'relative' }}>
-        <FoldCorner isOpen={hovered} sz={46} bgRgb={member.accentBgRgb} />
+      <motion.div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onTouchStart={() => setHovered(true)}
+        onTouchEnd={() => setHovered(false)}
+        animate={{ y: hovered ? -8 : 0, scale: hovered ? 1.01 : 1 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+        style={{
+          borderRadius: '12px',
+          overflow: 'hidden',
+          /* Border fades to transparent, shadow dissolves to soft glow */
+          border: hovered
+            ? '1px solid transparent'
+            : '1px solid rgba(0,0,0,0.07)',
+          backgroundColor: hovered
+            ? `rgba(${member.accentBgRgb},0.38)`
+            : member.accentBg,
+          boxShadow: hovered
+            ? `0 28px 56px rgba(${member.darkRgb},0.16), 0 8px 20px rgba(${member.darkRgb},0.08)`
+            : '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)',
+          transition: 'border-color 0.45s ease, background-color 0.45s ease, box-shadow 0.45s ease',
+        }}
+      >
+        <div className="flex flex-col sm:flex-row">
 
-        <motion.div
-          ref={cardRef}
-          {...handlers}
-          className="h-full"
-          style={{
-            backgroundColor: member.accentBg,
-            border: '1px solid rgba(0,0,0,0.06)',
-            borderRadius: '8px',
-            overflow: 'hidden',
-            boxShadow: hovered
-              ? '4px 14px 32px rgba(0,0,0,0.14)'
-              : '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)',
-            transition: 'box-shadow 0.3s ease',
-          }}
-          animate={{ y: hovered ? -4 : 0, rotate: hovered ? 0.4 : 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-        >
-          {/* Portrait + info — side by side on md+ */}
-          <div className="flex flex-col sm:flex-row">
-
-            {/* Photo */}
+          {/* Photo */}
+          <div
+            className="relative flex-shrink-0"
+            style={{ width: '100%', maxWidth: 200, aspectRatio: '3/4' }}
+          >
+            <img
+              src={member.photo}
+              alt={member.name}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center top',
+                display: 'block',
+                /* Photo edges soften on hover matching card */
+                transition: 'opacity 0.45s ease',
+                opacity: hovered ? 0.92 : 1,
+              }}
+            />
+            {/* Bottom gradient blends photo into card colour */}
             <div
-              className="relative flex-shrink-0"
-              style={{ width: '100%', maxWidth: 200, aspectRatio: '3/4' }}
-            >
-              <img
-                src={member.photo}
-                alt={member.name}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'center top',
-                  display: 'block',
-                }}
-              />
-              {/* Subtle gradient overlay at bottom of photo */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '40%',
-                  background: `linear-gradient(to bottom, transparent, ${member.accentBg}CC)`,
-                  pointerEvents: 'none',
-                }}
-              />
+              style={{
+                position: 'absolute',
+                bottom: 0, left: 0, right: 0,
+                height: '55%',
+                background: `linear-gradient(to bottom, transparent, ${member.accentBg}E0)`,
+                transition: 'background 0.45s ease',
+                pointerEvents: 'none',
+              }}
+            />
+          </div>
+
+          {/* Text content */}
+          <div className="flex flex-col p-6 flex-1">
+            <div className="mb-4">
+              <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '22px', fontWeight: 700, color: member.accentDark, lineHeight: 1.2, marginBottom: 4 }}>
+                {member.name}
+              </div>
+              <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', color: member.accentDark, opacity: 0.65, letterSpacing: '0.08em' }}>
+                {member.role}
+              </div>
             </div>
 
-            {/* Text content */}
-            <div className="flex flex-col p-6 flex-1">
-              {/* Name + role */}
-              <div className="mb-4">
-                <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '22px', fontWeight: 700, color: member.accentDark, lineHeight: 1.2, marginBottom: 4 }}>
-                  {member.name}
-                </div>
-                <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', color: member.accentDark, opacity: 0.65, letterSpacing: '0.08em' }}>
-                  {member.role}
-                </div>
-              </div>
+            <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: member.accentDark, lineHeight: 1.75, marginBottom: '1.25rem', opacity: 0.88, flex: 1 }}>
+              {member.bio}
+            </p>
 
-              {/* Bio */}
-              <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: member.accentDark, lineHeight: 1.75, marginBottom: '1.25rem', opacity: 0.88, flex: 1 }}>
-                {member.bio}
-              </p>
-
-              {/* Badges */}
-              <div className="flex flex-wrap gap-1.5">
-                {member.badges.map((badge) => (
-                  <span key={badge} style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', backgroundColor: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.80)', color: member.accentDark, borderRadius: '3px', padding: '2px 7px' }}>
-                    {badge}
-                  </span>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-1.5">
+              {member.badges.map((badge) => (
+                <span
+                  key={badge}
+                  style={{
+                    fontFamily: 'var(--font-ibm)',
+                    fontSize: '10px',
+                    backgroundColor: 'rgba(255,255,255,0.55)',
+                    border: '1px solid rgba(255,255,255,0.80)',
+                    color: member.accentDark,
+                    borderRadius: '3px',
+                    padding: '2px 7px',
+                  }}
+                >
+                  {badge}
+                </span>
+              ))}
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </Reveal>
   )
 }
 
+/* ── Manifesto card — keeps fold effect ──────────────────────── */
 function ManifestoCard() {
   const { hovered, ref: cardRef, handlers } = useCardFold()
 
