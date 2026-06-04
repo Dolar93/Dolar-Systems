@@ -94,3 +94,70 @@ body::before {
 
 .shadow-paper  { box-shadow: 2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08); }
 .shadow-lifted { box-shadow: 4px 12px 32px rgba(0,0,0,0.15); }
+
+/* ── Origami corner fold ─────────────────────────────────────────────
+ *
+ * Geometry: 52×52px wrapper sits at top-right of card.
+ * Triangle: polygon(0 0, 100% 0, 100% 100%)  — upper-right triangle.
+ * Fold crease: diagonal from (0,0)→(52,52), expressed as
+ *              rotate3d(1, 1, 0, angle) with transform-origin: 0% 0%.
+ *
+ * Two-face system:
+ *   .fold-front  — card brand colour, backface-visibility:hidden
+ *   .fold-back   — paper-inside texture, pre-rotated -180° on same axis
+ *
+ * When .fold-group reaches ≈-174°:
+ *   front → back-facing → hidden
+ *   back  → front-facing → visible  (shows paper inside)
+ *
+ * ------------------------------------------------------------------- */
+
+.fold-group {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotate3d(1, 1, 0, 0deg);
+  transform-origin: 0% 0%;
+  /* Organic spring: fast snap, slight overshoot, settle */
+  transition: transform 0.52s cubic-bezier(0.34, 1.35, 0.64, 1);
+  will-change: transform;
+}
+
+.fold-group.is-open {
+  transform: rotate3d(1, 1, 0, -174deg);
+}
+
+.fold-face {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Back face starts pre-flipped on the same axis */
+.fold-face-back {
+  transform: rotate3d(1, 1, 0, -180deg);
+  transform-origin: 0% 0%;
+  /* Warm paper-inside gradient */
+  background: linear-gradient(
+    215deg,
+    #ede8de 0%,
+    #d8d0c4 40%,
+    #c8c0b0 100%
+  );
+  /* Hairline crease along hypotenuse */
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.08);
+}
+
+/* ── Paper tension wrinkling ──────────────────────────────────────── */
+@keyframes paper-tension {
+  0%   { filter: brightness(1)    contrast(1)     saturate(1);   }
+  18%  { filter: brightness(0.965) contrast(1.025) saturate(0.97); }
+  55%  { filter: brightness(0.988) contrast(1.006) saturate(0.99); }
+  100% { filter: brightness(1)    contrast(1)     saturate(1);   }
+}
+
+.paper-wrinkle {
+  animation: paper-tension 0.62s ease-out;
+}
