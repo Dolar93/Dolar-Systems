@@ -66,3 +66,82 @@ body {
   outline: 1px solid #00D4FF;
   outline-offset: 2px;
 }
+
+/* ── Cybercore Hero Background ─────────────────────────────────────────── */
+
+:root {
+  --bg-color: #000308;
+  --light-color: #00D4FF;
+  --highlight-color: #00D4FF;
+  --glow-color-1: rgba(0, 212, 255, 0.8);
+  --glow-color-2: rgba(0, 150, 255, 0.6);
+  --highlight-glow: rgba(0, 212, 255, 0.7);
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: radial-gradient(ellipse at center bottom, rgba(0,212,255,0.08) 0%, transparent 70%);
+  animation: floorGlow 4s ease-in-out infinite;
+}
+
+.main-column {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,212,255,0.4), transparent);
+  animation: mainGlow 3s ease-in-out infinite alternate;
+}
+
+.light-stream-container {
+  position: absolute;
+  inset: 0;
+}
+
+.light-beam {
+  position: absolute;
+  bottom: 0;
+  height: 15%;
+  background: linear-gradient(to top, var(--glow-color-1), transparent);
+  animation: rise var(--rise-dur, 6s) ease-in infinite,
+             fade var(--fade-dur, 6s) ease-in-out infinite;
+  border-radius: 2px;
+}
+
+.light-beam.secondary {
+  background: linear-gradient(to top, var(--highlight-glow), transparent);
+  height: 20%;
+}
+
+@keyframes rise {
+  0% { transform: translateY(100%); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-5%); opacity: 0; }
+}
+
+@keyframes fade {
+  0%, 100% { opacity: 0; }
+  5%, 85% { opacity: 0.8; }
+}
+
+@keyframes floorGlow {
+  0%, 100% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes mainGlow {
+  from { opacity: 0.5; filter: blur(30px); }
+  to { opacity: 0.7; filter: blur(20px); }
+}
