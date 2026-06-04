@@ -6,6 +6,7 @@ import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
 
 const TEAM = [
   {
+    photo: '/bartosz.png',
     initials: 'BD',
     name: 'Bartosz "Dolar" Dolczewski',
     role: 'Architekt Automatyzacji · Założyciel',
@@ -14,8 +15,9 @@ const TEAM = [
     accentBg: '#D4E4C8', accentBgRgb: '212,228,200', accentDark: '#4A7A3A',
   },
   {
-    initials: 'M',
-    name: 'Marek',
+    photo: '/marek.png',
+    initials: 'MR',
+    name: 'Marek Rybka',
     role: 'Head of Business · Co-Founder',
     bio: 'Head w AppChance — firma z portfolio aplikacji mobilnych dla klientów B2B. Doświadczenie w sprzedaży enterprise, kontakty w branży IT i prawnej. Ogarnia biznes żebym ja mógł ogarniać kod.',
     badges: ['B2B Sales', 'AppChance', 'Mobile Apps', 'Enterprise'],
@@ -30,10 +32,10 @@ const MANIFESTO = [
 ]
 
 const COLLAGE = [
-  { bg: '#D4E4C8', w: 180, h: 240, rot: -6,  style: { left: '-30px', top: '40px'    } },
-  { bg: '#F2D4C8', w: 140, h: 190, rot: 8,   style: { right: '-20px', top: '60px'   } },
-  { bg: '#C8D4E8', w: 120, h: 160, rot: -4,  style: { left: '30px',  bottom: '20px' } },
-  { bg: '#D4C8E8', w: 100, h: 130, rot: 12,  style: { right: '10px', bottom: '30px' } },
+  { bg: '#D4E4C8', w: 180, h: 240, rot: -6,  style: { left: '-30px', top: '40px'    } as React.CSSProperties },
+  { bg: '#F2D4C8', w: 140, h: 190, rot: 8,   style: { right: '-20px', top: '60px'   } as React.CSSProperties },
+  { bg: '#C8D4E8', w: 120, h: 160, rot: -4,  style: { left: '30px',  bottom: '20px' } as React.CSSProperties },
+  { bg: '#D4C8E8', w: 100, h: 130, rot: 12,  style: { right: '10px', bottom: '30px' } as React.CSSProperties },
 ]
 
 function TeamCard({ member, index }: { member: typeof TEAM[number]; index: number }) {
@@ -41,53 +43,87 @@ function TeamCard({ member, index }: { member: typeof TEAM[number]; index: numbe
 
   return (
     <Reveal delay={index * 0.15}>
-      {/* Outer: overflow visible for FoldCorner */}
       <div style={{ position: 'relative' }}>
         <FoldCorner isOpen={hovered} sz={46} bgRgb={member.accentBgRgb} />
 
         <motion.div
           ref={cardRef}
           {...handlers}
-          className="paper-fold h-full p-8"
+          className="h-full"
           style={{
             backgroundColor: member.accentBg,
             border: '1px solid rgba(0,0,0,0.06)',
             borderRadius: '8px',
+            overflow: 'hidden',
             boxShadow: hovered
               ? '4px 14px 32px rgba(0,0,0,0.14)'
               : '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)',
             transition: 'box-shadow 0.3s ease',
-            overflow: 'hidden',
           }}
           animate={{ y: hovered ? -4 : 0, rotate: hovered ? 0.4 : 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 22 }}
         >
-          <div className="flex items-start gap-5 mb-6">
+          {/* Portrait + info — side by side on md+ */}
+          <div className="flex flex-col sm:flex-row">
+
+            {/* Photo */}
             <div
-              className="flex-shrink-0 flex items-center justify-center font-bold"
-              style={{ width: 72, height: 96, backgroundColor: 'rgba(255,255,255,0.55)', borderRadius: '4px', fontFamily: 'var(--font-playfair)', color: member.accentDark, fontSize: '22px' }}
-              aria-hidden
+              className="relative flex-shrink-0"
+              style={{ width: '100%', maxWidth: 200, aspectRatio: '3/4' }}
             >
-              {member.initials}
+              <img
+                src={member.photo}
+                alt={member.name}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center top',
+                  display: 'block',
+                }}
+              />
+              {/* Subtle gradient overlay at bottom of photo */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: '40%',
+                  background: `linear-gradient(to bottom, transparent, ${member.accentBg}CC)`,
+                  pointerEvents: 'none',
+                }}
+              />
             </div>
-            <div>
-              <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '22px', fontWeight: 600, color: member.accentDark, lineHeight: 1.2, marginBottom: 4 }}>
-                {member.name}
+
+            {/* Text content */}
+            <div className="flex flex-col p-6 flex-1">
+              {/* Name + role */}
+              <div className="mb-4">
+                <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '22px', fontWeight: 700, color: member.accentDark, lineHeight: 1.2, marginBottom: 4 }}>
+                  {member.name}
+                </div>
+                <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', color: member.accentDark, opacity: 0.65, letterSpacing: '0.08em' }}>
+                  {member.role}
+                </div>
               </div>
-              <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', color: member.accentDark, opacity: 0.7, letterSpacing: '0.08em' }}>
-                {member.role}
+
+              {/* Bio */}
+              <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: member.accentDark, lineHeight: 1.75, marginBottom: '1.25rem', opacity: 0.88, flex: 1 }}>
+                {member.bio}
+              </p>
+
+              {/* Badges */}
+              <div className="flex flex-wrap gap-1.5">
+                {member.badges.map((badge) => (
+                  <span key={badge} style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', backgroundColor: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.80)', color: member.accentDark, borderRadius: '3px', padding: '2px 7px' }}>
+                    {badge}
+                  </span>
+                ))}
               </div>
             </div>
-          </div>
-          <p style={{ fontFamily: 'var(--font-dm)', fontSize: '15px', color: member.accentDark, lineHeight: 1.75, marginBottom: '1.5rem', opacity: 0.9 }}>
-            {member.bio}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {member.badges.map((badge) => (
-              <span key={badge} style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', backgroundColor: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.80)', color: member.accentDark, borderRadius: '3px', padding: '2px 8px' }}>
-                {badge}
-              </span>
-            ))}
           </div>
         </motion.div>
       </div>
@@ -110,9 +146,7 @@ function ManifestoCard() {
           />
         ))}
 
-        {/* Outer: visible for FoldCorner on dark card */}
         <div style={{ position: 'relative' }}>
-          {/* Dark card fold — back face override to slightly lighter navy */}
           <FoldCorner
             isOpen={hovered}
             sz={50}
