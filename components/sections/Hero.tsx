@@ -85,7 +85,7 @@ export default function Hero() {
             opacity: 0.55,
           }}
         >
-          <source src="/videos/film2.mp4" type="video/mp4" />
+          <source src="/videos/noir.mp4" type="video/mp4" />
         </motion.video>
       </div>
 
