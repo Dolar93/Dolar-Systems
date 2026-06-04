@@ -38,11 +38,44 @@ function Seal() {
   )
 }
 
-/* ── Title block (passed to ContainerScroll) ────────────────────── */
+/* ── Floating paper cards in background ─────────────────────────── */
+const FLOATING_CARDS = [
+  { bg: '#D4E4C8', w: 120, h: 160, rot: -8,  right: '15%', top: '20%', dur: 6,   delay: 0, rotAnim: [2, 4, 2]   },
+  { bg: '#F2D4C8', w: 80,  h: 110, rot: 12,  right: '25%', top: '35%', dur: 7,   delay: 2, rotAnim: [12, 14, 12] },
+  { bg: '#C8D4E8', w: 100, h: 140, rot: -3,  right: '10%', top: '45%', dur: 8,   delay: 4, rotAnim: [-3, -1, -3] },
+]
+
+function FloatingCards() {
+  return (
+    <>
+      {FLOATING_CARDS.map((c, i) => (
+        <motion.div
+          key={i}
+          style={{
+            position: 'absolute',
+            right: c.right,
+            top: c.top,
+            width: c.w,
+            height: c.h,
+            backgroundColor: c.bg,
+            borderRadius: '6px',
+            rotate: c.rot,
+            boxShadow: '4px 8px 20px rgba(0,0,0,0.10)',
+            zIndex: 2,
+          }}
+          animate={{ y: [0, -15, 0], rotate: c.rotAnim }}
+          transition={{ duration: c.dur, repeat: Infinity, ease: 'easeInOut', delay: c.delay }}
+          aria-hidden
+        />
+      ))}
+    </>
+  )
+}
+
+/* ── Title block ────────────────────────────────────────────────── */
 function HeroTitle() {
   return (
     <div className="flex flex-col items-center">
-      {/* Tag */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -54,7 +87,6 @@ function HeroTitle() {
         </span>
       </motion.div>
 
-      {/* H1 */}
       <motion.h1
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -70,7 +102,6 @@ function HeroTitle() {
         </span>
       </motion.h1>
 
-      {/* Sub */}
       <motion.p
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -81,7 +112,6 @@ function HeroTitle() {
         <span style={{ color: '#1A2B47', fontWeight: 500 }}>Nie prezentacje — produkcja.</span>
       </motion.p>
 
-      {/* CTAs */}
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -108,7 +138,6 @@ function HeroTitle() {
         </a>
       </motion.div>
 
-      {/* Stats */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -122,8 +151,8 @@ function HeroTitle() {
         ].map((s) => (
           <div
             key={s.label}
-            className="flex-1 p-5 text-center"
-            style={{ backgroundColor: '#FAFAF8', border: '1px solid rgba(26,43,71,0.10)', borderRadius: '8px', boxShadow: '0 2px 12px rgba(26,43,71,0.08)' }}
+            className="flex-1 p-5 text-center paper-texture"
+            style={{ backgroundColor: '#FAFAF8', border: '1px solid rgba(26,43,71,0.10)', borderRadius: '8px', boxShadow: '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)' }}
           >
             <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '28px', fontWeight: 700, color: '#1A2B47', lineHeight: 1, marginBottom: '4px' }}>
               {s.val}
@@ -147,12 +176,13 @@ export default function Hero() {
       style={{ backgroundColor: '#F5F3EF' }}
       aria-label="Hero"
     >
-      {/* Seal — top right */}
-      <div
-        className="absolute hidden lg:block"
-        style={{ top: '5rem', right: '4rem', zIndex: 10 }}
-        aria-hidden
-      >
+      {/* Floating paper cards */}
+      <div className="absolute inset-0 hidden lg:block pointer-events-none" style={{ zIndex: 2 }}>
+        <FloatingCards />
+      </div>
+
+      {/* Seal */}
+      <div className="absolute hidden lg:block" style={{ top: '5rem', right: '4rem', zIndex: 10 }} aria-hidden>
         <Seal />
       </div>
 
@@ -178,15 +208,7 @@ export default function Hero() {
       </motion.div>
 
       <ContainerScroll titleComponent={<HeroTitle />}>
-        {/* Video inside the 3D scroll card */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-          style={{ borderRadius: '18px' }}
-        >
+        <video autoPlay loop muted playsInline className="w-full h-full object-cover" style={{ borderRadius: '18px' }}>
           <source src="/videos/heroorigami.mp4" type="video/mp4" />
         </video>
       </ContainerScroll>
