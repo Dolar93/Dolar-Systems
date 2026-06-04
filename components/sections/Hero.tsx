@@ -211,7 +211,7 @@ export default function Hero() {
             mixBlendMode: 'multiply',
           }}
         >
-          <source src="/videos/noir.mp4" type="video/mp4" />
+          <source src="/videos/heroorigami.mp4" type="video/mp4" />
         </motion.video>
       </div>
 
