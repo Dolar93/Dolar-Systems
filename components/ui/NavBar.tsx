@@ -32,10 +32,11 @@ export default function NavBar() {
       transition={{ duration: 0.28, ease: 'easeInOut' }}
       className="fixed top-0 left-0 right-0 z-50"
       style={{
-        borderBottom: '1px solid #1E1E1E',
-        backdropFilter: 'blur(14px)',
-        WebkitBackdropFilter: 'blur(14px)',
-        backgroundColor: 'rgba(10, 10, 10, 0.88)',
+        backgroundColor: 'rgba(250,250,247,0.92)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid #E7E5E4',
+        boxShadow: '0 1px 12px rgba(28,25,23,0.06)',
       }}
     >
       <nav
@@ -45,11 +46,11 @@ export default function NavBar() {
         {/* Logo */}
         <a
           href="#"
-          className="text-sm font-bold tracking-[0.18em] select-none"
-          style={{ fontFamily: 'var(--font-ibm)', color: '#F5F5F5' }}
+          className="font-bold select-none"
+          style={{ fontFamily: 'var(--font-fraunces)', color: '#1C1917', fontSize: '18px' }}
           aria-label="Dolar Systems — strona główna"
         >
-          DOLAR<span style={{ color: '#00D4FF' }}>_</span>SYSTEMS
+          Dolar<span style={{ color: '#4F46E5' }}>.</span>Systems
         </a>
 
         {/* Desktop links */}
@@ -59,10 +60,16 @@ export default function NavBar() {
               key={link.href}
               href={link.href}
               role="listitem"
-              className="text-xs tracking-[0.1em] transition-colors duration-200 hover:text-[#F5F5F5]"
-              style={{ fontFamily: 'var(--font-ibm)', color: '#666' }}
+              className="text-sm transition-all duration-200 relative group"
+              style={{ fontFamily: 'var(--font-dm)', color: '#57534E' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#1C1917')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#57534E')}
             >
               {link.label}
+              <span
+                className="absolute -bottom-0.5 left-0 w-0 group-hover:w-full transition-all duration-200"
+                style={{ height: '1.5px', backgroundColor: '#4F46E5' }}
+              />
             </a>
           ))}
         </div>
@@ -70,34 +77,33 @@ export default function NavBar() {
         {/* CTA */}
         <a
           href="#kontakt"
-          className="hidden md:inline-flex items-center text-xs px-5 py-2.5 transition-all duration-250"
+          className="hidden md:inline-flex items-center text-sm px-5 py-2 rounded-lg font-medium transition-all duration-200"
           style={{
-            fontFamily: 'var(--font-ibm)',
-            border: '1px solid #00D4FF',
-            color: '#00D4FF',
-            letterSpacing: '0.12em',
+            fontFamily: 'var(--font-dm)',
+            backgroundColor: '#4F46E5',
+            color: '#ffffff',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#00D4FF'
-            e.currentTarget.style.color = '#0A0A0A'
+            e.currentTarget.style.backgroundColor = '#4338CA'
+            e.currentTarget.style.boxShadow = '0 4px 14px rgba(79,70,229,0.35)'
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent'
-            e.currentTarget.style.color = '#00D4FF'
+            e.currentTarget.style.backgroundColor = '#4F46E5'
+            e.currentTarget.style.boxShadow = 'none'
           }}
         >
-          UMÓW ANALIZĘ
+          Bezpłatna analiza →
         </a>
 
         {/* Hamburger */}
         <button
-          className="md:hidden p-2 transition-colors"
+          className="md:hidden p-2 rounded-lg transition-colors cursor-pointer"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? 'Zamknij menu' : 'Otwórz menu'}
           aria-expanded={mobileOpen}
-          style={{ color: '#F5F5F5' }}
+          style={{ color: '#1C1917' }}
         >
-          {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </nav>
 
@@ -110,8 +116,8 @@ export default function NavBar() {
           transition={{ duration: 0.2 }}
           className="md:hidden px-6 pb-6"
           style={{
-            borderTop: '1px solid #1E1E1E',
-            backgroundColor: 'rgba(10, 10, 10, 0.96)',
+            borderTop: '1px solid #E7E5E4',
+            backgroundColor: 'rgba(250,250,247,0.98)',
           }}
         >
           <div className="flex flex-col gap-1 pt-4">
@@ -119,11 +125,11 @@ export default function NavBar() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm py-3 border-b transition-colors"
+                className="text-sm py-3 border-b"
                 style={{
-                  fontFamily: 'var(--font-ibm)',
-                  color: '#666',
-                  borderColor: '#1E1E1E',
+                  fontFamily: 'var(--font-dm)',
+                  color: '#57534E',
+                  borderColor: '#E7E5E4',
                 }}
                 onClick={() => setMobileOpen(false)}
               >
@@ -132,16 +138,15 @@ export default function NavBar() {
             ))}
             <a
               href="#kontakt"
-              className="text-xs px-5 py-3 text-center mt-4"
+              className="text-sm px-5 py-3 text-center mt-4 rounded-lg font-medium"
               style={{
-                fontFamily: 'var(--font-ibm)',
-                border: '1px solid #00D4FF',
-                color: '#00D4FF',
-                letterSpacing: '0.12em',
+                fontFamily: 'var(--font-dm)',
+                backgroundColor: '#4F46E5',
+                color: '#ffffff',
               }}
               onClick={() => setMobileOpen(false)}
             >
-              UMÓW ANALIZĘ
+              Bezpłatna analiza →
             </a>
           </div>
         </motion.div>

@@ -1,22 +1,27 @@
 import type { Metadata } from 'next'
-import { IBM_Plex_Mono, Inter, Space_Mono } from 'next/font/google'
+import { Fraunces, DM_Sans, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '900'],
+  style: ['normal', 'italic'],
+  variable: '--font-fraunces',
+  display: 'swap',
+})
+
+const dmSans = DM_Sans({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-dm',
+  display: 'swap',
+})
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600'],
   variable: '--font-ibm',
-})
-
-const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-inter',
-})
-
-const spaceMono = Space_Mono({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-space-mono',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -38,8 +43,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://dolar-systems.pl'),
   openGraph: {
     title: 'Dolar Systems — Twoja firma. Zautomatyzowana.',
-    description:
-      'Wdrażamy systemy AI które działają. Nie prezentacje — produkcja.',
+    description: 'Wdrażamy systemy AI które działają. Nie prezentacje — produkcja.',
     url: 'https://dolar-systems.pl',
     siteName: 'Dolar Systems',
     locale: 'pl_PL',
@@ -50,21 +54,14 @@ export const metadata: Metadata = {
     title: 'Dolar Systems',
     description: 'Agencja AI automatyzacji dla MŚP',
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="pl"
-      className={`${ibmPlexMono.variable} ${inter.variable} ${spaceMono.variable}`}
+      className={`${fraunces.variable} ${dmSans.variable} ${ibmPlexMono.variable}`}
     >
       <body>{children}</body>
     </html>

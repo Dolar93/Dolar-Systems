@@ -1,17 +1,19 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg: #0A0A0A;
-  --color-card: #111111;
-  --color-border: #1E1E1E;
-  --color-accent: #00D4FF;
-  --color-accent2: #E8FF47;
-  --color-primary: #F5F5F5;
-  --color-muted: #666666;
+  --color-bg:       #FAFAF7;
+  --color-bg-card:  #FFFFFF;
+  --color-bg-alt:   #F0EDE6;
+  --color-border:   #E7E5E4;
+  --color-accent:   #4F46E5;
+  --color-accent-2: #F59E0B;
+  --color-primary:  #1C1917;
+  --color-muted:    #57534E;
+  --color-faint:    #A8A29E;
 
-  --font-mono: var(--font-ibm), ui-monospace, monospace;
-  --font-sans: var(--font-inter), ui-sans-serif, sans-serif;
-  --font-space: var(--font-space-mono), ui-monospace, monospace;
+  --font-heading: var(--font-fraunces), Georgia, serif;
+  --font-body:    var(--font-dm), system-ui, sans-serif;
+  --font-mono:    var(--font-ibm), ui-monospace, monospace;
 }
 
 * {
@@ -23,125 +25,57 @@ html {
 }
 
 body {
-  background-color: #0A0A0A;
-  color: #F5F5F5;
-  font-family: var(--font-inter), ui-sans-serif, sans-serif;
+  background-color: #FAFAF7;
+  color: #1C1917;
+  font-family: var(--font-dm), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
 ::selection {
-  background: #00D4FF;
-  color: #0A0A0A;
+  background: #4F46E5;
+  color: #ffffff;
 }
 
-.terminal-grid {
-  background-image:
-    linear-gradient(rgba(0, 212, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.035) 1px, transparent 1px);
-  background-size: 64px 64px;
+/* Warm dot-grid utility */
+.warm-grid {
+  background-image: radial-gradient(circle, rgba(79,70,229,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-.terminal-grid-dense {
-  background-image:
-    linear-gradient(rgba(0, 212, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.025) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-
-::-webkit-scrollbar {
-  width: 3px;
-}
-::-webkit-scrollbar-track {
-  background: #0A0A0A;
-}
-::-webkit-scrollbar-thumb {
-  background: #1E1E1E;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #00D4FF;
-}
+/* Scrollbar */
+::-webkit-scrollbar        { width: 4px; }
+::-webkit-scrollbar-track  { background: #F0EDE6; }
+::-webkit-scrollbar-thumb  { background: #D6D3D1; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #4F46E5; }
 
 :focus-visible {
-  outline: 1px solid #00D4FF;
+  outline: 2px solid #4F46E5;
   outline-offset: 2px;
 }
 
-/* ── Cybercore Hero Background ─────────────────────────────────────────── */
+/* Card shadow scale */
+.card-shadow        { box-shadow: 0 1px 3px rgba(28,25,23,0.07), 0 4px 12px rgba(28,25,23,0.04); }
+.card-shadow-hover  { box-shadow: 0 8px 24px rgba(28,25,23,0.10), 0 20px 48px rgba(28,25,23,0.06); }
 
-:root {
-  --bg-color: #000308;
-  --light-color: #00D4FF;
-  --highlight-color: #00D4FF;
-  --glow-color-1: rgba(0, 212, 255, 0.8);
-  --glow-color-2: rgba(0, 150, 255, 0.6);
-  --highlight-glow: rgba(0, 212, 255, 0.7);
-}
-
-.scene {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  background: transparent;
-}
-
-.floor {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: radial-gradient(ellipse at center bottom, rgba(0,212,255,0.08) 0%, transparent 70%);
-  animation: floorGlow 4s ease-in-out infinite;
-}
-
-.main-column {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 100%;
-  background: linear-gradient(to top, rgba(0,212,255,0.4), transparent);
-  animation: mainGlow 3s ease-in-out infinite alternate;
-}
-
-.light-stream-container {
-  position: absolute;
-  inset: 0;
-}
-
-.light-beam {
-  position: absolute;
-  bottom: 0;
-  height: 15%;
-  background: linear-gradient(to top, var(--glow-color-1), transparent);
-  animation: rise var(--rise-dur, 6s) ease-in infinite,
-             fade var(--fade-dur, 6s) ease-in-out infinite;
-  border-radius: 2px;
-}
-
-.light-beam.secondary {
-  background: linear-gradient(to top, var(--highlight-glow), transparent);
-  height: 20%;
-}
-
-@keyframes rise {
-  0% { transform: translateY(100%); opacity: 0; }
-  10% { opacity: 1; }
-  100% { transform: translateY(-5%); opacity: 0; }
-}
-
-@keyframes fade {
-  0%, 100% { opacity: 0; }
-  5%, 85% { opacity: 0.8; }
-}
-
-@keyframes floorGlow {
-  0%, 100% { transform: scale(0.95); opacity: 0.7; }
-  50% { transform: scale(1.05); opacity: 1; }
-}
-
-@keyframes mainGlow {
-  from { opacity: 0.5; filter: blur(30px); }
-  to { opacity: 0.7; filter: blur(20px); }
+/* Gradient mesh for hero */
+.gradient-mesh {
+  background:
+    radial-gradient(ellipse 70% 60% at 80% 40%, rgba(79,70,229,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 20% 70%, rgba(245,158,11,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 50% 10%, rgba(79,70,229,0.05) 0%, transparent 70%),
+    #FAFAF7;
 }

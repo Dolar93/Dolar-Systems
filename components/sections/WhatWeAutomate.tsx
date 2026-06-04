@@ -9,7 +9,7 @@ const INDUSTRIES = [
   {
     num: '01',
     Icon: Scale,
-    name: 'KANCELARIE PRAWNE',
+    name: 'Kancelarie Prawne',
     tasks: [
       'Auto-generowanie umów z szablonów',
       'Chatbot intake klientów 24/7',
@@ -17,25 +17,29 @@ const INDUSTRIES = [
       'Automatyczne faktury i dokumenty',
     ],
     stack: ['n8n', 'Claude AI', 'DocuSign'],
+    accent: '#4F46E5',
+    accentBg: 'rgba(79,70,229,0.07)',
     span: 'lg:col-span-2',
   },
   {
     num: '02',
     Icon: Stethoscope,
-    name: 'KLINIKI / STOMATOLOGIA',
+    name: 'Kliniki / Stomatologia',
     tasks: [
       'Chatbot umawiający wizyty',
-      'SMS/email przypomnienia (–60% no-show)',
+      'SMS/email — 60% mniej no-show',
       'Automatyczny wywiad medyczny',
       'Raporty NFZ i dokumentacja',
     ],
     stack: ['Make.com', 'Twilio', 'CRM'],
+    accent: '#0D9488',
+    accentBg: 'rgba(13,148,136,0.07)',
     span: '',
   },
   {
     num: '03',
     Icon: Building2,
-    name: 'AGENCJE NIERUCHOMOŚCI',
+    name: 'Agencje Nieruchomości',
     tasks: [
       'Auto-odpowiedzi na zapytania OLX/Otodom',
       'Kwalifikacja leadów przez AI',
@@ -43,12 +47,14 @@ const INDUSTRIES = [
       'CRM pipeline automatyczny',
     ],
     stack: ['Make.com', 'GPT-4', 'CRM'],
+    accent: '#F59E0B',
+    accentBg: 'rgba(245,158,11,0.07)',
     span: '',
   },
   {
     num: '04',
     Icon: Landmark,
-    name: 'DEWELOPERZY',
+    name: 'Deweloperzy',
     tasks: [
       'Raporty sprzedaży auto-generowane',
       'Dashboard KPI w czasie rzeczywistym',
@@ -56,12 +62,14 @@ const INDUSTRIES = [
       'Integracja z systemami ERP',
     ],
     stack: ['n8n', 'PostgreSQL', 'Claude AI'],
+    accent: '#7C3AED',
+    accentBg: 'rgba(124,58,237,0.07)',
     span: '',
   },
   {
     num: '05',
     Icon: Factory,
-    name: 'FIRMY PRODUKCYJNE',
+    name: 'Firmy Produkcyjne',
     tasks: [
       'Automatyczne zamówienia przy niskim stanie',
       'Raporty produkcyjne codzienne',
@@ -69,17 +77,13 @@ const INDUSTRIES = [
       'Integracja z ERP/WMS',
     ],
     stack: ['n8n', 'Make.com', 'ERP API'],
+    accent: '#EA580C',
+    accentBg: 'rgba(234,88,12,0.07)',
     span: '',
   },
 ]
 
-function Card({
-  item,
-  index,
-}: {
-  item: (typeof INDUSTRIES)[0]
-  index: number
-}) {
+function Card({ item, index }: { item: (typeof INDUSTRIES)[0]; index: number }) {
   const [hovered, setHovered] = useState(false)
   const { Icon } = item
 
@@ -95,41 +99,49 @@ function Card({
       }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
-      whileHover={{ y: -3 }}
-      transition={{ duration: 0.18 }}
-      className={`flex flex-col gap-5 p-7 ${item.span}`}
+      animate={hovered ? { y: -4 } : { y: 0 }}
+      transition={{ duration: 0.22, type: 'spring', stiffness: 300, damping: 24 }}
+      className={`flex flex-col gap-5 p-7 rounded-2xl ${item.span}`}
       style={{
-        border: `2px solid ${hovered ? '#00D4FF' : '#1E1E1E'}`,
-        backgroundColor: '#111111',
-        transition: 'border-color 0.22s',
+        backgroundColor: '#FFFFFF',
+        border: `1.5px solid ${hovered ? item.accent : '#E7E5E4'}`,
+        boxShadow: hovered
+          ? `0 8px 32px rgba(28,25,23,0.10), 0 0 0 1px ${item.accent}22`
+          : '0 1px 4px rgba(28,25,23,0.06)',
+        transition: 'border-color 0.22s, box-shadow 0.22s',
         cursor: 'default',
       }}
     >
       {/* Header */}
       <div className="flex items-start justify-between">
         <span
-          className="text-xs"
-          style={{ fontFamily: 'var(--font-space-mono)', color: '#2A2A2A' }}
-        >
-          [ {item.num} ]
-        </span>
-        <Icon
-          size={18}
+          className="text-xs px-2 py-0.5 rounded-full"
           style={{
-            color: hovered ? '#00D4FF' : '#333',
-            transition: 'color 0.22s',
+            fontFamily: 'var(--font-ibm)',
+            color: item.accent,
+            backgroundColor: item.accentBg,
+            fontSize: '10px',
           }}
-        />
+        >
+          {item.num}
+        </span>
+        <div
+          className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors duration-220"
+          style={{
+            backgroundColor: hovered ? item.accentBg : '#F4F1EB',
+          }}
+        >
+          <Icon
+            size={17}
+            style={{ color: hovered ? item.accent : '#A8A29E', transition: 'color 0.22s' }}
+          />
+        </div>
       </div>
 
       {/* Name */}
       <h3
-        className="text-[13px] font-bold"
-        style={{
-          fontFamily: 'var(--font-ibm)',
-          color: '#F5F5F5',
-          letterSpacing: '0.06em',
-        }}
+        className="text-base font-semibold leading-snug"
+        style={{ fontFamily: 'var(--font-fraunces)', color: '#1C1917' }}
       >
         {item.name}
       </h3>
@@ -139,14 +151,14 @@ function Card({
         {item.tasks.map((task) => (
           <li
             key={task}
-            className="flex items-start gap-2 text-xs"
-            style={{ color: '#555', fontFamily: 'var(--font-inter)' }}
+            className="flex items-start gap-2 text-sm"
+            style={{ color: '#57534E', fontFamily: 'var(--font-dm)' }}
           >
             <span
-              style={{ color: '#00D4FF', flexShrink: 0, marginTop: 1 }}
+              style={{ color: item.accent, flexShrink: 0, marginTop: 2, fontSize: '14px' }}
               aria-hidden
             >
-              ›
+              ✓
             </span>
             {task}
           </li>
@@ -154,16 +166,19 @@ function Card({
       </ul>
 
       {/* Stack badges */}
-      <div className="flex flex-wrap gap-2 pt-2" style={{ borderTop: '1px solid #1A1A1A' }}>
+      <div
+        className="flex flex-wrap gap-2 pt-4"
+        style={{ borderTop: '1px solid #F0EDE6' }}
+      >
         {item.stack.map((tech) => (
           <span
             key={tech}
-            className="text-[10px] px-2 py-0.5"
+            className="text-[10px] px-2.5 py-1 rounded-full"
             style={{
-              fontFamily: 'var(--font-space-mono)',
-              color: '#00D4FF',
-              border: '1px solid rgba(0,212,255,0.18)',
-              backgroundColor: 'rgba(0,212,255,0.04)',
+              fontFamily: 'var(--font-ibm)',
+              color: item.accent,
+              border: `1px solid ${item.accent}28`,
+              backgroundColor: item.accentBg,
             }}
           >
             {tech}
@@ -178,19 +193,20 @@ export default function WhatWeAutomate() {
   return (
     <section
       id="zakres"
-      className="py-28 terminal-grid-dense"
-      style={{ backgroundColor: '#0A0A0A' }}
+      className="py-28"
+      style={{ backgroundColor: '#F4F1EB' }}
     >
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="mb-14">
           <SectionLabel number="02" label="ZAKRES WDROŻEŃ" />
           <h2
-            className="text-4xl md:text-5xl font-bold leading-tight"
-            style={{ fontFamily: 'var(--font-ibm)', color: '#F5F5F5' }}
+            className="text-4xl md:text-5xl font-bold leading-tight max-w-2xl"
+            style={{ fontFamily: 'var(--font-fraunces)', color: '#1C1917' }}
           >
-            Konkretne systemy.
-            <br />
-            <span style={{ color: '#00D4FF' }}>Konkretne branże.</span>
+            Konkretne systemy.{' '}
+            <span style={{ color: '#4F46E5', fontStyle: 'italic' }}>
+              Konkretne branże.
+            </span>
           </h2>
         </Reveal>
 
@@ -198,7 +214,7 @@ export default function WhatWeAutomate() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           {INDUSTRIES.map((item, i) => (
             <Card key={item.num} item={item} index={i} />
