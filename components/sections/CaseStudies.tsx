@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion'
 import { CheckCheck, Clock, Scale, Stethoscope, Landmark } from 'lucide-react'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { Reveal } from '@/components/animations/reveal'
+import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
 
 function useCountUp(end: number, inView: boolean, duration = 1.4) {
   const [val, setVal] = useState(0)
@@ -54,7 +55,9 @@ const CASES = [
   },
 ]
 
-function MetricBlock({ num, prefix, suffix, label, inView, dark }: { num: number; prefix: string; suffix: string; label: string; inView: boolean; dark: string }) {
+function MetricBlock({ num, prefix, suffix, label, inView, dark }: {
+  num: number; prefix: string; suffix: string; label: string; inView: boolean; dark: string
+}) {
   const val = useCountUp(num, inView)
   return (
     <div className="text-center">
@@ -69,83 +72,90 @@ function MetricBlock({ num, prefix, suffix, label, inView, dark }: { num: number
 }
 
 function CaseCard({ item, index }: { item: (typeof CASES)[number]; index: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const { hovered, ref: cardRef, handlers } = useCardFold()
+  const inViewRef = useRef<HTMLDivElement>(null)
+  const inView = useInView(inViewRef, { once: true, margin: '-80px' })
   const { Icon } = item
 
   return (
+    /* Outer: overflow visible so FoldCorner isn't clipped by border-radius */
     <motion.div
-      ref={ref}
-      className="paper-texture flex flex-col"
-      style={{
-        backgroundColor: '#FAFAF8',
-        border: '1px solid rgba(26,43,71,0.08)',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        boxShadow: '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)',
-      }}
+      ref={inViewRef}
+      style={{ position: 'relative' }}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.6, delay: index * 0.12, ease: 'easeOut' }}
-      whileHover={{ y: -6, rotate: -0.5, boxShadow: '4px 12px 32px rgba(0,0,0,0.15)' }}
+      animate={{ y: hovered ? -6 : 0, rotate: hovered ? -0.4 : 0 }}
     >
-      {/* Coloured top strip */}
-      <div style={{ height: 8, backgroundColor: item.strip }} />
+      <FoldCorner isOpen={hovered} sz={46} bgRgb="250,250,248" />
 
-      <div className="flex flex-col flex-1 p-7">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-5">
-          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '13px', color: '#8A9AB5', letterSpacing: '0.1em' }}>
-            [{item.num}]
-          </span>
-          <div className="flex items-center gap-2">
-            <Icon size={14} style={{ color: item.stripDark, opacity: 0.7 }} aria-hidden />
-            <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', backgroundColor: item.badgeBg, color: item.stripDark, borderRadius: '2px', padding: '2px 8px' }}>
-              {item.branch}
+      {/* Inner: overflow hidden clips colour strip at border-radius */}
+      <div
+        ref={cardRef}
+        {...handlers}
+        className="paper-texture flex flex-col"
+        style={{
+          backgroundColor: '#FAFAF8',
+          border: '1px solid rgba(26,43,71,0.08)',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          boxShadow: hovered
+            ? '4px 14px 32px rgba(0,0,0,0.14)'
+            : '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)',
+          transition: 'box-shadow 0.3s ease',
+        }}
+      >
+        <div style={{ height: 8, backgroundColor: item.strip }} />
+
+        <div className="flex flex-col flex-1 p-7">
+          <div className="flex items-start justify-between mb-5">
+            <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '13px', color: '#8A9AB5', letterSpacing: '0.1em' }}>
+              [{item.num}]
             </span>
-          </div>
-        </div>
-
-        {/* Metrics */}
-        <div className="flex justify-around mb-5 pb-5" style={{ borderBottom: '1px solid rgba(26,43,71,0.07)' }}>
-          {item.metrics.map((m) => (
-            <MetricBlock key={m.label} {...m} inView={inView} dark={item.stripDark} />
-          ))}
-        </div>
-
-        {/* Problem */}
-        <div className="mb-4">
-          <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 6 }}>Problem</div>
-          <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#3D4F6B', fontStyle: 'italic', lineHeight: 1.7 }}>„{item.problem}"</p>
-        </div>
-
-        {/* Solution */}
-        <div className="mb-5 flex-1">
-          <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 6 }}>Rozwiązanie</div>
-          <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#3D4F6B', lineHeight: 1.7 }}>{item.solution}</p>
-        </div>
-
-        {/* Effects */}
-        <div className="flex flex-col gap-1.5 mb-5 pb-5" style={{ borderBottom: '1px solid rgba(26,43,71,0.07)' }}>
-          {item.effects.map((e) => (
-            <div key={e} className="flex items-center gap-2 text-sm" style={{ fontFamily: 'var(--font-dm)', color: '#1A2B47' }}>
-              <CheckCheck size={13} style={{ color: '#2D7A4F', flexShrink: 0 }} aria-hidden />
-              {e}
+            <div className="flex items-center gap-2">
+              <Icon size={14} style={{ color: item.stripDark, opacity: 0.7 }} aria-hidden />
+              <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', backgroundColor: item.badgeBg, color: item.stripDark, borderRadius: '2px', padding: '2px 8px' }}>
+                {item.branch}
+              </span>
             </div>
-          ))}
-        </div>
-
-        {/* Price + time */}
-        <div className="flex items-end justify-between">
-          <div>
-            <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 4 }}>Inwestycja</div>
-            <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '34px', fontWeight: 700, color: '#1A2B47', lineHeight: 1 }}>od {item.price} zł</div>
           </div>
-          <div className="text-right">
-            <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 4 }}>Czas</div>
-            <div className="flex items-center gap-1.5" style={{ fontFamily: 'var(--font-ibm)', fontSize: '12px', color: '#8A9AB5' }}>
-              <Clock size={11} aria-hidden />{item.time}
+
+          <div className="flex justify-around mb-5 pb-5" style={{ borderBottom: '1px solid rgba(26,43,71,0.07)' }}>
+            {item.metrics.map((m) => (
+              <MetricBlock key={m.label} {...m} inView={inView} dark={item.stripDark} />
+            ))}
+          </div>
+
+          <div className="mb-4">
+            <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 6 }}>Problem</div>
+            <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#3D4F6B', fontStyle: 'italic', lineHeight: 1.7 }}>„{item.problem}"</p>
+          </div>
+
+          <div className="mb-5 flex-1">
+            <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 6 }}>Rozwiązanie</div>
+            <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#3D4F6B', lineHeight: 1.7 }}>{item.solution}</p>
+          </div>
+
+          <div className="flex flex-col gap-1.5 mb-5 pb-5" style={{ borderBottom: '1px solid rgba(26,43,71,0.07)' }}>
+            {item.effects.map((e) => (
+              <div key={e} className="flex items-center gap-2 text-sm" style={{ fontFamily: 'var(--font-dm)', color: '#1A2B47' }}>
+                <CheckCheck size={13} style={{ color: '#2D7A4F', flexShrink: 0 }} aria-hidden />
+                {e}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-end justify-between">
+            <div>
+              <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 4 }}>Inwestycja</div>
+              <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '34px', fontWeight: 700, color: '#1A2B47', lineHeight: 1 }}>od {item.price} zł</div>
+            </div>
+            <div className="text-right">
+              <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 4 }}>Czas</div>
+              <div className="flex items-center gap-1.5" style={{ fontFamily: 'var(--font-ibm)', fontSize: '12px', color: '#8A9AB5' }}>
+                <Clock size={11} aria-hidden />{item.time}
+              </div>
             </div>
           </div>
         </div>

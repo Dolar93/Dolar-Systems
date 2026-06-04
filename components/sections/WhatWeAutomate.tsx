@@ -1,9 +1,9 @@
 'use client'
-import { useState, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Scale, Stethoscope, Building2, Landmark, Factory } from 'lucide-react'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { Reveal } from '@/components/animations/reveal'
+import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
 
 /* ── Brand config ──────────────────────────────────────────────── */
 const BRAND = {
@@ -62,106 +62,6 @@ const INDUSTRIES = [
   },
 ] as const
 
-/* ── Origami corner fold ────────────────────────────────────────────
- *
- *  Wrapper (52×52px, top-right):
- *    ├─ Reveal layer       — paper-inside tint, always present
- *    ├─ Perspective shell  — provides independent 3D space for THIS corner
- *    │   └─ .fold-group    — rotates via CSS class toggle
- *    │       ├─ .fold-face (front)  — card colour, backface-visibility:hidden
- *    │       └─ .fold-face-back     — inside texture, pre-flipped −180°
- *    └─ Shadow overlay     — radial gradient cast on card surface
- *
- * ─────────────────────────────────────────────────────────────────── */
-function FoldCorner({
-  bgRgb,
-  isOpen,
-  sz,
-}: {
-  bgRgb: string
-  isOpen: boolean
-  sz: number
-}) {
-  return (
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        width: sz,
-        height: sz,
-        zIndex: 10,
-        pointerEvents: 'none',
-      }}
-    >
-      {/* ① Reveal: what's "under" the paper when it folds */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          clipPath: 'polygon(0 0, 100% 0, 100% 100%)',
-          background: `linear-gradient(
-            215deg,
-            rgba(${bgRgb},0.30) 0%,
-            rgba(195,185,168,0.50) 100%
-          )`,
-        }}
-      />
-
-      {/* ② Perspective shell — each corner gets its own vanishing point */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          perspective: '280px',
-          perspectiveOrigin: '0% 0%',
-        }}
-      >
-        {/*
-         *  .fold-group is driven by CSS class:
-         *    default  → rotate3d(1,1,0,   0deg)
-         *    is-open  → rotate3d(1,1,0,-174deg)
-         *
-         *  Children inherit this transform stacked on top of their own.
-         */}
-        <div className={`fold-group${isOpen ? ' is-open' : ''}`}>
-
-          {/* Front face — card surface colour */}
-          <div
-            className="fold-face"
-            style={{ backgroundColor: `rgba(${bgRgb}, 0.97)` }}
-          />
-
-          {/*
-           *  Back face — pre-flipped −180° on the SAME rotate3d axis.
-           *  net angle at open state: −180° + (−174°) from parent
-           *  → resolves to +6° from viewer → clearly visible.
-           */}
-          <div className="fold-face fold-face-back" />
-
-        </div>
-      </div>
-
-      {/* ③ Drop shadow cast on card surface below the lifted corner */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          clipPath: 'polygon(0 0, 100% 0, 100% 100%)',
-          transition: 'opacity 0.35s ease',
-          opacity: isOpen ? 1 : 0,
-          background: `radial-gradient(
-            ellipse 85% 70% at 88% 12%,
-            rgba(0,0,0,0.18) 0%,
-            rgba(0,0,0,0.05) 55%,
-            transparent 75%
-          )`,
-        }}
-      />
-    </div>
-  )
-}
 
 /* ── 3D task block ─────────────────────────────────────────────── */
 function TaskBlock({ text, darkRgb, index }: { text: string; darkRgb: string; index: number }) {
@@ -208,33 +108,16 @@ function OrigamiBird({ color, size = 32, rotate = 0, opacity = 0.28 }: {
 
 /* ── Industry card ─────────────────────────────────────────────── */
 function Card({ item }: { item: (typeof INDUSTRIES)[number] }) {
-  const [hovered, setHovered] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
+  const { hovered, ref: cardRef, handlers } = useCardFold()
   const b = BRAND[item.id]
   const { Icon } = item
-
-  /* Toggle .paper-wrinkle class to trigger @keyframes paper-tension.
-   * We remove & re-add instead of toggling to allow re-trigger. */
-  const triggerWrinkle = useCallback(() => {
-    const el = cardRef.current
-    if (!el) return
-    el.classList.remove('paper-wrinkle')
-    // Force reflow so animation restarts cleanly
-    void el.offsetWidth
-    el.classList.add('paper-wrinkle')
-  }, [])
-
   const foldSz = item.large ? 56 : 46
 
   return (
     <div className={item.gridClass} style={{ perspective: '700px' }}>
       <motion.div
         ref={cardRef}
-        onMouseEnter={() => { setHovered(true);  triggerWrinkle() }}
-        onMouseLeave={() => { setHovered(false) }}
-        /* Touch support */
-        onTouchStart={() => { setHovered(true);  triggerWrinkle() }}
-        onTouchEnd={() => { setHovered(false) }}
+        {...handlers}
         className="h-full flex flex-col gap-3"
         style={{
           position: 'relative',

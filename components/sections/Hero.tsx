@@ -1,6 +1,7 @@
 'use client'
 import { motion } from 'framer-motion'
 import { ContainerScroll } from '@/components/ui/container-scroll-animation'
+import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
 
 /* ── Rotating Seal ──────────────────────────────────────────────── */
 function Seal() {
@@ -69,6 +70,39 @@ function FloatingCards() {
         />
       ))}
     </>
+  )
+}
+
+/* ── Stat card with fold ───────────────────────────────────────── */
+function StatCard({ val, label }: { val: string; label: string }) {
+  const { hovered, ref, handlers } = useCardFold()
+  return (
+    <div className="flex-1" style={{ position: 'relative' }}>
+      <FoldCorner isOpen={hovered} sz={32} bgRgb="250,250,248" />
+      <div
+        ref={ref}
+        {...handlers}
+        className="p-5 text-center paper-texture"
+        style={{
+          backgroundColor: '#FAFAF8',
+          border: '1px solid rgba(26,43,71,0.10)',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          boxShadow: hovered
+            ? '4px 10px 24px rgba(0,0,0,0.12)'
+            : '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)',
+          transition: 'box-shadow 0.3s ease, transform 0.25s ease',
+          transform: hovered ? 'translateY(-3px)' : 'none',
+        }}
+      >
+        <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '28px', fontWeight: 700, color: '#1A2B47', lineHeight: 1, marginBottom: '4px' }}>
+          {val}
+        </div>
+        <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.18em' }}>
+          {label}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -149,18 +183,7 @@ function HeroTitle() {
           { val: '−60%',         label: 'PRACA MANUALNA' },
           { val: '24/7',         label: 'SYSTEMY DZIAŁAJĄ' },
         ].map((s) => (
-          <div
-            key={s.label}
-            className="flex-1 p-5 text-center paper-texture"
-            style={{ backgroundColor: '#FAFAF8', border: '1px solid rgba(26,43,71,0.10)', borderRadius: '8px', boxShadow: '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)' }}
-          >
-            <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '28px', fontWeight: 700, color: '#1A2B47', lineHeight: 1, marginBottom: '4px' }}>
-              {s.val}
-            </div>
-            <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.18em' }}>
-              {s.label}
-            </div>
-          </div>
+          <StatCard key={s.label} val={s.val} label={s.label} />
         ))}
       </motion.div>
     </div>
