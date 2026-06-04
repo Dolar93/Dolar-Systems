@@ -29,21 +29,14 @@ const CASES = [
     branch: 'Kancelaria Prawna',
     location: 'Warszawa',
     problem: 'Prawnicy tracili 15h tygodniowo na ręczne generowanie umów i follow-up.',
-    solution:
-      'System AI generujący umowy z szablonów na podstawie danych klienta. Automatyczny follow-up email/SMS co 3/7/14 dni. Integracja z kalendarzem i CRM.',
+    solution: 'System AI generujący umowy z szablonów na podstawie danych klienta. Automatyczny follow-up email/SMS co 3/7/14 dni.',
     metrics: [
-      { num: 15, suffix: 'h', prefix: '–', label: 'tygodniowo oszczędności' },
-      { num: 40, suffix: '%', prefix: '+', label: 'skuteczność follow-up' },
+      { num: 15, suffix: 'h', prefix: '–', label: 'tygodniowo' },
+      { num: 40, suffix: '%', prefix: '+', label: 'follow-up' },
     ],
-    effects: [
-      '–15h tygodniowo pracy manualnej',
-      '+40% skuteczność follow-up',
-      '0 zapomnianych klientów',
-    ],
+    effects: ['–15h tygodniowo pracy manualnej', '+40% skuteczność follow-up', '0 zapomnianych klientów'],
     price: '4 900',
     time: '3 tygodnie',
-    accentColor: '#4F46E5',
-    accentBg: 'rgba(79,70,229,0.07)',
   },
   {
     num: '002',
@@ -51,21 +44,14 @@ const CASES = [
     branch: 'Klinika Stomatologiczna',
     location: 'Poznań',
     problem: '30% wizyt kończyło się no-show. Recepcja nie nadążała z przypomnieniami.',
-    solution:
-      'Chatbot AI umawiający wizyty przez stronę i WhatsApp. Automatyczne SMS 48h i 2h przed wizytą. System zbierania opinii po wizycie.',
+    solution: 'Chatbot AI umawiający wizyty przez stronę i WhatsApp. Automatyczne SMS 48h i 2h przed wizytą.',
     metrics: [
-      { num: 62, suffix: '%', prefix: '–', label: 'no-show rate' },
-      { num: 25, suffix: '%', prefix: '+', label: 'zapełnienie kalendarza' },
+      { num: 62, suffix: '%', prefix: '–', label: 'no-show' },
+      { num: 25, suffix: '%', prefix: '+', label: 'kalendarza' },
     ],
-    effects: [
-      '–62% no-show rate',
-      '+25% zapełnienie kalendarza',
-      'Recepcja odciążona o 8h/tydzień',
-    ],
+    effects: ['–62% no-show rate', '+25% zapełnienie kalendarza', 'Recepcja odciążona o 8h/tydzień'],
     price: '5 900',
     time: '2 tygodnie',
-    accentColor: '#0D9488',
-    accentBg: 'rgba(13,148,136,0.07)',
   },
   {
     num: '003',
@@ -73,42 +59,27 @@ const CASES = [
     branch: 'Deweloper Mieszkaniowy',
     location: 'Polska',
     problem: 'Handlowcy ręcznie tworzyli raporty sprzedaży 3h dziennie. Zero automatyzacji CRM.',
-    solution:
-      'Dashboard KPI aktualizowany w czasie rzeczywistym. Auto-raporty PDF wysyłane o 8:00 do zarządu. Automatyczny pipeline CRM z follow-up leadów.',
+    solution: 'Dashboard KPI w czasie rzeczywistym. Auto-raporty PDF wysyłane o 8:00 do zarządu.',
     metrics: [
-      { num: 0, suffix: 'h', prefix: '', label: 'raportowania ręcznego' },
-      { num: 35, suffix: '%', prefix: '+', label: 'konwersja leadów' },
+      { num: 0, suffix: 'h', prefix: '', label: 'raportowania' },
+      { num: 35, suffix: '%', prefix: '+', label: 'konwersja' },
     ],
-    effects: [
-      '0h raportowania manualnego',
-      'Zarząd ma dane w czasie rzeczywistym',
-      '+35% konwersja leadów',
-    ],
+    effects: ['0h raportowania manualnego', 'Zarząd ma dane w czasie rzeczywistym', '+35% konwersja leadów'],
     price: '6 900',
     time: '4 tygodnie',
-    accentColor: '#7C3AED',
-    accentBg: 'rgba(124,58,237,0.07)',
   },
 ]
 
-function MetricCounter({
-  num, prefix, suffix, label, inView, accent
-}: {
-  num: number; prefix: string; suffix: string; label: string; inView: boolean; accent: string
+function MetricBlock({ num, prefix, suffix, label, inView }: {
+  num: number; prefix: string; suffix: string; label: string; inView: boolean
 }) {
   const val = useCountUp(num, inView)
   return (
     <div className="text-center">
-      <div
-        className="text-3xl font-bold leading-none mb-1"
-        style={{ fontFamily: 'var(--font-fraunces)', color: accent }}
-      >
+      <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '36px', fontWeight: 700, color: '#1A2B47', lineHeight: 1 }}>
         {prefix}{val}{suffix}
       </div>
-      <div
-        className="text-xs leading-tight"
-        style={{ fontFamily: 'var(--font-dm)', color: '#A8A29E' }}
-      >
+      <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.12em', marginTop: 4 }}>
         {label}
       </div>
     </div>
@@ -127,51 +98,42 @@ function CaseCard({ item, index }: { item: (typeof CASES)[0]; index: number }) {
       variants={{
         hidden: { opacity: 0, y: 40 },
         visible: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.65, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
+          opacity: 1, y: 0,
+          transition: { duration: 0.6, delay: index * 0.12, ease: 'easeOut' },
         },
       }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
-      animate={hovered ? { y: -4 } : { y: 0 }}
-      transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 24 }}
-      className="flex flex-col rounded-2xl overflow-hidden"
+      animate={hovered ? { y: -6 } : { y: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className="flex flex-col"
       style={{
-        backgroundColor: '#FFFFFF',
-        border: `1.5px solid ${hovered ? item.accentColor : '#E7E5E4'}`,
+        backgroundColor: '#FAFAF8',
+        border: '1px solid rgba(26,43,71,0.10)',
+        borderLeft: '3px solid #C9A84C',
+        borderRadius: '8px',
         boxShadow: hovered
-          ? `0 12px 40px rgba(28,25,23,0.10)`
-          : '0 1px 4px rgba(28,25,23,0.06)',
-        transition: 'border-color 0.25s, box-shadow 0.25s',
+          ? '0 16px 40px rgba(26,43,71,0.15)'
+          : '0 2px 12px rgba(26,43,71,0.08), 0 1px 3px rgba(26,43,71,0.04)',
+        transition: 'box-shadow 0.3s ease',
       }}
     >
-      {/* Color strip */}
-      <div style={{ height: 4, backgroundColor: item.accentColor, opacity: 0.7 }} />
-
-      <div className="flex flex-col flex-1 p-7">
+      <div className="flex flex-col flex-1 p-8">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
-          <span
-            className="text-3xl font-bold select-none"
-            style={{ fontFamily: 'var(--font-fraunces)', color: '#F0EDE6' }}
-          >
-            {item.num}
+          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '13px', color: '#8A9AB5', letterSpacing: '0.1em' }}>
+            [{item.num}]
           </span>
           <div className="flex items-center gap-2">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: item.accentBg }}
-            >
-              <Icon size={15} style={{ color: item.accentColor }} aria-hidden />
-            </div>
+            <Icon size={14} style={{ color: '#8A9AB5' }} aria-hidden />
             <span
-              className="text-xs px-2.5 py-1 rounded-full"
+              className="text-xs px-2 py-0.5"
               style={{
-                fontFamily: 'var(--font-dm)',
-                color: item.accentColor,
-                backgroundColor: item.accentBg,
-                fontSize: '11px',
+                fontFamily: 'var(--font-ibm)',
+                backgroundColor: 'rgba(201,168,76,0.15)',
+                color: '#8A6B2A',
+                borderRadius: '2px',
+                fontSize: '10px',
               }}
             >
               {item.branch}
@@ -179,68 +141,41 @@ function CaseCard({ item, index }: { item: (typeof CASES)[0]; index: number }) {
           </div>
         </div>
 
-        {/* Metrics count-up */}
+        {/* Metrics */}
         <div
           className="flex justify-around mb-6 pb-6"
-          style={{ borderBottom: '1px solid #F0EDE6' }}
+          style={{ borderBottom: '1px solid rgba(26,43,71,0.07)' }}
         >
           {item.metrics.map((m) => (
-            <MetricCounter
-              key={m.label}
-              num={m.num}
-              prefix={m.prefix}
-              suffix={m.suffix}
-              label={m.label}
-              inView={inView}
-              accent={item.accentColor}
-            />
+            <MetricBlock key={m.label} {...m} inView={inView} />
           ))}
         </div>
 
         {/* Problem */}
         <div className="mb-4">
-          <div
-            className="text-[10px] tracking-[0.22em] mb-1.5 uppercase"
-            style={{ color: '#A8A29E', fontFamily: 'var(--font-ibm)' }}
-          >
+          <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 6 }}>
             Problem
           </div>
-          <p
-            className="text-sm italic leading-relaxed"
-            style={{ color: '#57534E', fontFamily: 'var(--font-dm)' }}
-          >
+          <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#3D4F6B', fontStyle: 'italic', lineHeight: 1.7 }}>
             „{item.problem}"
           </p>
         </div>
 
         {/* Solution */}
         <div className="mb-5 flex-1">
-          <div
-            className="text-[10px] tracking-[0.22em] mb-1.5 uppercase"
-            style={{ color: '#A8A29E', fontFamily: 'var(--font-ibm)' }}
-          >
+          <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 6 }}>
             Rozwiązanie
           </div>
-          <p
-            className="text-sm leading-relaxed"
-            style={{ color: '#57534E', fontFamily: 'var(--font-dm)' }}
-          >
+          <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#3D4F6B', lineHeight: 1.7 }}>
             {item.solution}
           </p>
         </div>
 
         {/* Effects */}
-        <div
-          className="flex flex-col gap-1.5 mb-6 pb-6"
-          style={{ borderBottom: '1px solid #F0EDE6' }}
-        >
+        <div className="flex flex-col gap-2 mb-6 pb-6" style={{ borderBottom: '1px solid rgba(26,43,71,0.07)' }}>
           {item.effects.map((e) => (
-            <div
-              key={e}
-              className="flex items-center gap-2 text-sm"
-              style={{ color: '#1C1917', fontFamily: 'var(--font-dm)' }}
-            >
-              <CheckCheck size={13} style={{ color: item.accentColor, flexShrink: 0 }} aria-hidden />
+            <div key={e} className="flex items-center gap-2 text-sm" style={{ fontFamily: 'var(--font-dm)', color: '#1A2B47' }}>
+              <CheckCheck size={13} style={{ color: '#2D7A4F', flexShrink: 0 }} aria-hidden />
               {e}
             </div>
           ))}
@@ -249,31 +184,19 @@ function CaseCard({ item, index }: { item: (typeof CASES)[0]; index: number }) {
         {/* Price + time */}
         <div className="flex items-end justify-between">
           <div>
-            <div
-              className="text-[10px] tracking-[0.2em] uppercase mb-1"
-              style={{ color: '#A8A29E', fontFamily: 'var(--font-ibm)' }}
-            >
+            <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 4 }}>
               Inwestycja
             </div>
-            <div
-              className="text-2xl font-bold"
-              style={{ fontFamily: 'var(--font-fraunces)', color: item.accentColor }}
-            >
+            <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '36px', fontWeight: 700, color: '#1A2B47', lineHeight: 1 }}>
               od {item.price} zł
             </div>
           </div>
           <div className="text-right">
-            <div
-              className="text-[10px] tracking-[0.2em] uppercase mb-1"
-              style={{ color: '#A8A29E', fontFamily: 'var(--font-ibm)' }}
-            >
+            <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 4 }}>
               Czas
             </div>
-            <div
-              className="flex items-center gap-1.5 text-sm"
-              style={{ color: '#57534E', fontFamily: 'var(--font-dm)' }}
-            >
-              <Clock size={12} aria-hidden />
+            <div className="flex items-center gap-1.5" style={{ fontFamily: 'var(--font-ibm)', fontSize: '12px', color: '#8A9AB5' }}>
+              <Clock size={11} aria-hidden />
               {item.time}
             </div>
           </div>
@@ -285,25 +208,19 @@ function CaseCard({ item, index }: { item: (typeof CASES)[0]; index: number }) {
 
 export default function CaseStudies() {
   return (
-    <section id="realizacje" className="py-28" style={{ backgroundColor: '#FAFAF7' }}>
+    <section id="realizacje" className="py-28" style={{ backgroundColor: '#EEEAE3' }}>
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="mb-3">
           <SectionLabel number="03" label="REALIZACJE" />
         </Reveal>
         <Reveal delay={0.05} className="mb-2">
-          <h2
-            className="text-4xl md:text-5xl font-bold"
-            style={{ fontFamily: 'var(--font-fraunces)', color: '#1C1917' }}
-          >
+          <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(36px, 5vw, 48px)', fontWeight: 700, color: '#1A2B47' }}>
             Wdrożenia które działają{' '}
-            <span style={{ color: '#4F46E5', fontStyle: 'italic' }}>w produkcji.</span>
+            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>w produkcji.</span>
           </h2>
         </Reveal>
         <Reveal delay={0.1} className="mb-14">
-          <p
-            className="text-sm mt-3"
-            style={{ color: '#A8A29E', fontFamily: 'var(--font-dm)' }}
-          >
+          <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#8A9AB5', marginTop: 8 }}>
             Ceny orientacyjne. Bezpłatna analiza = konkretna wycena dla Twojej firmy.
           </p>
         </Reveal>
@@ -322,22 +239,10 @@ export default function CaseStudies() {
         <Reveal delay={0.3} className="mt-12 flex justify-center">
           <a
             href="#kontakt"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer"
-            style={{
-              fontFamily: 'var(--font-dm)',
-              backgroundColor: '#4F46E5',
-              color: '#ffffff',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#4338CA'
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(79,70,229,0.38)'
-              e.currentTarget.style.transform = 'translateY(-1px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#4F46E5'
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'none'
-            }}
+            className="inline-flex items-center gap-2 text-sm font-medium transition-all duration-200 cursor-pointer"
+            style={{ fontFamily: 'var(--font-dm)', backgroundColor: '#1A2B47', color: '#F5F3EF', padding: '16px 40px', borderRadius: '4px' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#C9A84C'; e.currentTarget.style.color = '#1A2B47' }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#1A2B47'; e.currentTarget.style.color = '#F5F3EF' }}
           >
             Umów bezpłatną analizę →
           </a>

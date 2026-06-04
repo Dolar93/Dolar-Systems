@@ -10,8 +10,6 @@ const TEAM = [
     role: 'Architekt Automatyzacji · Założyciel',
     bio: 'Buduję systemy AI które zastępują powtarzalną pracę. Stack: Node.js, Make.com, n8n, Claude AI, PostgreSQL. Każde wdrożenie traktuję jak projekt inżynierski — najpierw architektura, potem kod.',
     badges: ['Node.js', 'Make.com', 'n8n', 'Claude AI', 'PostgreSQL', 'Railway'],
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&auto=format',
-    accentColor: '#4F46E5',
   },
   {
     initials: 'M',
@@ -19,33 +17,24 @@ const TEAM = [
     role: 'Head of Business · Co-Founder',
     bio: 'Head w AppChance — firma z portfolio aplikacji mobilnych dla klientów B2B. Doświadczenie w sprzedaży enterprise, kontakty w branży IT i prawnej. Ogarnia biznes żebym ja mógł ogarniać kod.',
     badges: ['B2B Sales', 'AppChance', 'Mobile Apps', 'Enterprise'],
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&auto=format',
-    accentColor: '#F59E0B',
   },
 ]
 
 const MANIFESTO = [
   'Automatyzujemy procesy które zjadają czas Twoich ludzi.',
-  'Nie jesteśmy kolejną "agencją AI". Jesteśmy wdrożeniowcami.',
+  'Nie jesteśmy kolejną „agencją AI". Jesteśmy wdrożeniowcami.',
   'Każdy projekt: analiza → architektura → wdrożenie → support.',
 ]
 
 export default function AboutUs() {
   return (
-    <section
-      id="zespol"
-      className="py-28 warm-grid"
-      style={{ backgroundColor: '#F4F1EB' }}
-    >
+    <section id="zespol" className="py-28" style={{ backgroundColor: '#F5F3EF' }}>
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="mb-14">
           <SectionLabel number="04" label="ZESPÓŁ" />
-          <h2
-            className="text-4xl md:text-5xl font-bold leading-tight max-w-2xl"
-            style={{ fontFamily: 'var(--font-fraunces)', color: '#1C1917' }}
-          >
+          <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(36px, 5vw, 48px)', fontWeight: 700, color: '#1A2B47', maxWidth: 600 }}>
             Nie sprzedajemy narzędzi.{' '}
-            <span style={{ color: '#4F46E5', fontStyle: 'italic' }}>
+            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>
               Wdrażamy systemy które działają.
             </span>
           </h2>
@@ -56,36 +45,28 @@ export default function AboutUs() {
           {TEAM.map((member, i) => (
             <Reveal key={member.name} delay={i * 0.15}>
               <div
-                className="p-8 h-full rounded-2xl"
+                className="p-8 h-full"
                 style={{
-                  backgroundColor: '#FFFFFF',
-                  border: '1.5px solid #E7E5E4',
-                  boxShadow: '0 2px 8px rgba(28,25,23,0.06)',
+                  backgroundColor: '#FAFAF8',
+                  border: '1px solid rgba(26,43,71,0.10)',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 12px rgba(26,43,71,0.08), 0 1px 3px rgba(26,43,71,0.04)',
                 }}
               >
                 {/* Avatar + name */}
-                <div className="flex items-start gap-4 mb-6">
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    className="w-14 h-14 rounded-full object-cover flex-shrink-0"
-                    style={{
-                      border: `2px solid ${member.accentColor}33`,
-                    }}
-                    onError={(e) => {
-                      const el = e.currentTarget as HTMLImageElement
-                      el.style.display = 'none'
-                      const fallback = el.nextElementSibling as HTMLElement | null
-                      if (fallback) fallback.style.display = 'flex'
-                    }}
-                  />
+                <div className="flex items-start gap-5 mb-6">
+                  {/* Photo placeholder */}
                   <div
-                    className="w-14 h-14 rounded-full flex-shrink-0 items-center justify-center text-sm font-bold hidden"
+                    className="flex-shrink-0 flex items-center justify-center font-bold text-lg"
                     style={{
-                      fontFamily: 'var(--font-fraunces)',
-                      backgroundColor: `${member.accentColor}14`,
-                      border: `2px solid ${member.accentColor}33`,
-                      color: member.accentColor,
+                      width: 72,
+                      height: 96,
+                      backgroundColor: '#EEEAE3',
+                      borderRadius: '4px',
+                      fontFamily: 'var(--font-playfair)',
+                      color: '#8A9AB5',
+                      fontSize: '22px',
+                      letterSpacing: '0.05em',
                     }}
                     aria-hidden
                   >
@@ -93,25 +74,25 @@ export default function AboutUs() {
                   </div>
                   <div>
                     <div
-                      className="font-semibold mb-0.5"
-                      style={{ fontFamily: 'var(--font-fraunces)', color: '#1C1917', fontSize: '15px' }}
+                      style={{
+                        fontFamily: 'var(--font-playfair)',
+                        fontSize: '22px',
+                        fontWeight: 600,
+                        color: '#1A2B47',
+                        lineHeight: 1.2,
+                        marginBottom: 4,
+                      }}
                     >
                       {member.name}
                     </div>
-                    <div
-                      className="text-xs"
-                      style={{ fontFamily: 'var(--font-ibm)', color: member.accentColor, opacity: 0.9 }}
-                    >
+                    <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '12px', color: '#8A9AB5', letterSpacing: '0.08em' }}>
                       {member.role}
                     </div>
                   </div>
                 </div>
 
                 {/* Bio */}
-                <p
-                  className="text-sm leading-relaxed mb-6"
-                  style={{ color: '#57534E', fontFamily: 'var(--font-dm)', lineHeight: 1.75 }}
-                >
+                <p style={{ fontFamily: 'var(--font-dm)', fontSize: '15px', color: '#3D4F6B', lineHeight: 1.75, marginBottom: '1.5rem' }}>
                   {member.bio}
                 </p>
 
@@ -120,13 +101,8 @@ export default function AboutUs() {
                   {member.badges.map((badge) => (
                     <span
                       key={badge}
-                      className="text-[10px] px-2.5 py-1 rounded-full"
-                      style={{
-                        fontFamily: 'var(--font-ibm)',
-                        color: member.accentColor,
-                        border: `1px solid ${member.accentColor}28`,
-                        backgroundColor: `${member.accentColor}0D`,
-                      }}
+                      className="text-[11px] px-2 py-0.5"
+                      style={{ fontFamily: 'var(--font-ibm)', backgroundColor: 'rgba(26,43,71,0.06)', color: '#3D4F6B', borderRadius: '2px' }}
                     >
                       {badge}
                     </span>
@@ -137,21 +113,25 @@ export default function AboutUs() {
           ))}
         </div>
 
-        {/* Manifesto quote */}
+        {/* Manifesto */}
         <Reveal delay={0.3}>
           <div
-            className="relative rounded-2xl p-10 overflow-hidden"
+            className="relative p-10 md:p-14"
             style={{
-              backgroundColor: '#1C1917',
+              backgroundColor: '#FAFAF8',
+              border: '1px solid rgba(26,43,71,0.10)',
+              borderRadius: '8px',
+              boxShadow: '0 2px 12px rgba(26,43,71,0.08), 0 1px 3px rgba(26,43,71,0.04)',
             }}
           >
             {/* Decorative quote mark */}
             <div
-              className="absolute top-6 left-8 select-none"
+              className="absolute top-6 left-10 select-none pointer-events-none"
               style={{
-                fontFamily: 'var(--font-fraunces)',
+                fontFamily: 'var(--font-playfair)',
                 fontSize: '96px',
-                color: 'rgba(79,70,229,0.15)',
+                color: '#C9A84C',
+                opacity: 0.18,
                 lineHeight: 1,
               }}
               aria-hidden
@@ -161,35 +141,32 @@ export default function AboutUs() {
 
             <div className="relative">
               <div
-                className="text-xs tracking-[0.22em] uppercase mb-6"
-                style={{ fontFamily: 'var(--font-ibm)', color: '#A8A29E' }}
+                style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: '2rem' }}
               >
                 Nasze podejście
               </div>
-
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-5">
                 {MANIFESTO.map((line, i) => (
                   <motion.p
                     key={i}
-                    initial={{ opacity: 0, x: -12 }}
+                    initial={{ opacity: 0, x: -10 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.15 + 0.3, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                    className="text-lg md:text-xl font-medium leading-relaxed"
+                    transition={{ delay: i * 0.15 + 0.2, duration: 0.5, ease: 'easeOut' }}
                     style={{
-                      fontFamily: 'var(--font-fraunces)',
-                      color: i === 0 ? '#FFFFFF' : '#A8A29E',
+                      fontFamily: 'var(--font-playfair)',
+                      fontSize: 'clamp(18px, 2.5vw, 26px)',
+                      fontStyle: 'italic',
+                      fontWeight: 500,
+                      color: i === 0 ? '#1A2B47' : '#3D4F6B',
+                      lineHeight: 1.5,
                     }}
                   >
                     {line}
                   </motion.p>
                 ))}
               </div>
-
-              <div
-                className="mt-8 text-sm"
-                style={{ fontFamily: 'var(--font-ibm)', color: '#4F46E5', opacity: 0.9 }}
-              >
+              <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', color: '#C9A84C', marginTop: '2.5rem', letterSpacing: '0.08em' }}>
                 — Bartosz "Dolar" Dolczewski, Dolar Systems
               </div>
             </div>
