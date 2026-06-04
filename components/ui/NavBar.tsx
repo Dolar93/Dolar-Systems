@@ -4,10 +4,10 @@ import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 
 const NAV_LINKS = [
-  { href: '#zakres', label: 'Zakres' },
-  { href: '#realizacje', label: 'Realizacje' },
-  { href: '#zespol', label: 'Zespół' },
-  { href: '#kontakt', label: 'Kontakt' },
+  { href: '/#zakres', label: 'Zakres' },
+  { href: '/#realizacje', label: 'Realizacje' },
+  { href: '/#zespol', label: 'Zespół' },
+  { href: '/#kontakt', label: 'Kontakt' },
 ]
 
 export default function NavBar() {
@@ -85,7 +85,7 @@ export default function NavBar() {
 
         {/* CTA */}
         <a
-          href="#kontakt"
+          href="/#kontakt"
           className="hidden md:inline-flex items-center text-sm px-5 py-2.5 font-medium transition-all duration-200 cursor-pointer"
           style={{
             fontFamily: 'var(--font-dm)',
@@ -140,7 +140,7 @@ export default function NavBar() {
               </a>
             ))}
             <a
-              href="#kontakt"
+              href="/#kontakt"
               className="text-sm px-5 py-3 text-center mt-4 font-medium"
               style={{ fontFamily: 'var(--font-dm)', backgroundColor: '#1A2B47', color: '#F5F3EF', borderRadius: '4px' }}
               onClick={() => setMobileOpen(false)}

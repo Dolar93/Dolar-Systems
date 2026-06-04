@@ -1,10 +1,10 @@
 'use client'
 
 const LINKS = [
-  { href: '#zakres', label: 'Zakres' },
-  { href: '#realizacje', label: 'Realizacje' },
-  { href: '#zespol', label: 'Zespół' },
-  { href: '#kontakt', label: 'Kontakt' },
+  { href: '/#zakres', label: 'Zakres' },
+  { href: '/#realizacje', label: 'Realizacje' },
+  { href: '/#zespol', label: 'Zespół' },
+  { href: '/#kontakt', label: 'Kontakt' },
 ]
 
 export default function Footer() {
@@ -63,7 +63,7 @@ export default function Footer() {
               Gotowy na automatyzację?
             </div>
             <a
-              href="#kontakt"
+              href="/#kontakt"
               className="inline-flex items-center text-sm font-medium transition-all duration-200 cursor-pointer"
               style={{ fontFamily: 'var(--font-dm)', backgroundColor: '#C9A84C', color: '#1A2B47', padding: '12px 28px', borderRadius: '4px' }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F5F3EF' }}

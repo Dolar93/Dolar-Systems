@@ -1,6 +1,8 @@
 'use client'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Scale, Stethoscope, Building2, Landmark, Factory } from 'lucide-react'
+import { Scale, Stethoscope, Building2, Landmark, Factory, ArrowRight } from 'lucide-react'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { Reveal } from '@/components/animations/reveal'
 import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
@@ -17,6 +19,7 @@ const BRAND = {
 const INDUSTRIES = [
   {
     id: 'kancelarie'    as const,
+    slug: '/branzy/kancelarie-prawne',
     num: '01', Icon: Scale,
     name: 'Kancelarie Prawne',
     tasks: ['Auto-generowanie umów z szablonów', 'Chatbot intake klientów 24/7', 'System follow-up i przypomnień', 'Automatyczne faktury i dokumenty'],
@@ -26,6 +29,7 @@ const INDUSTRIES = [
   },
   {
     id: 'kliniki'       as const,
+    slug: '/branzy/kliniki-stomatologia',
     num: '02', Icon: Stethoscope,
     name: 'Kliniki / Stomatologia',
     tasks: ['Chatbot umawiający wizyty', 'SMS/email — −60% no-show', 'Automatyczny wywiad medyczny', 'Raporty NFZ i dokumentacja'],
@@ -35,6 +39,7 @@ const INDUSTRIES = [
   },
   {
     id: 'nieruchomosci' as const,
+    slug: '/branzy/agencje-nieruchomosci',
     num: '03', Icon: Building2,
     name: 'Agencje Nieruchomości',
     tasks: ['Auto-odpowiedzi na OLX/Otodom', 'Kwalifikacja leadów przez AI', 'Generowanie opisów', 'CRM pipeline automatyczny'],
@@ -44,6 +49,7 @@ const INDUSTRIES = [
   },
   {
     id: 'deweloperzy'   as const,
+    slug: '/branzy/deweloperzy',
     num: '04', Icon: Landmark,
     name: 'Deweloperzy',
     tasks: ['Raporty sprzedaży auto-generowane', 'Dashboard KPI real-time', 'Auto-follow-up kupujących', 'Integracja z ERP'],
@@ -53,6 +59,7 @@ const INDUSTRIES = [
   },
   {
     id: 'produkcja'     as const,
+    slug: '/branzy/firmy-produkcyjne',
     num: '05', Icon: Factory,
     name: 'Firmy Produkcyjne',
     tasks: ['Zamówienia przy niskim stanie', 'Raporty produkcyjne codzienne', 'System zgłoszeń i eskalacji', 'Integracja z ERP/WMS'],
@@ -109,12 +116,15 @@ function OrigamiBird({ color, size = 32, rotate = 0, opacity = 0.28 }: {
 /* ── Industry card ─────────────────────────────────────────────── */
 function Card({ item }: { item: (typeof INDUSTRIES)[number] }) {
   const { hovered, ref: cardRef, handlers } = useCardFold()
+  const router = useRouter()
   const b = BRAND[item.id]
   const { Icon } = item
   const foldSz = item.large ? 56 : 46
 
   return (
-    <div className={item.gridClass} style={{ perspective: '700px' }}>
+    <div className={item.gridClass} style={{ perspective: '700px' }}
+      onClick={() => router.push(item.slug)}
+    >
       <motion.div
         ref={cardRef}
         {...handlers}
@@ -127,10 +137,10 @@ function Card({ item }: { item: (typeof INDUSTRIES)[number] }) {
           border: '1px solid rgba(255,255,255,0.60)',
           borderRadius: '8px',
           padding: item.large ? '20px' : '16px',
-          /* overflow:visible so fold flap is not clipped by border-radius */
           overflow: 'visible',
           transformOrigin: 'top center',
           transformStyle: 'preserve-3d',
+          cursor: 'pointer',
         }}
         initial={{ rotateX: 6, opacity: 0, y: 20 }}
         whileInView={{ rotateX: 6, opacity: 1, y: 0 }}
@@ -194,6 +204,23 @@ function Card({ item }: { item: (typeof INDUSTRIES)[number] }) {
             </span>
           ))}
         </div>
+
+        {/* CTA link */}
+        <Link
+          href={item.slug}
+          className="inline-flex items-center gap-1.5 mt-1 transition-opacity duration-200"
+          style={{
+            fontFamily: 'var(--font-ibm)',
+            fontSize: '11px',
+            color: b.dark,
+            opacity: hovered ? 1 : 0.55,
+            letterSpacing: '0.08em',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          Zobacz ofertę
+          <ArrowRight size={11} />
+        </Link>
       </motion.div>
     </div>
   )
