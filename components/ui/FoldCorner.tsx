@@ -41,12 +41,12 @@ export function useCardFold() {
  *
  * Layers (bottom → top):
  *   ① Reveal bg      — warm cream, always present under flap
- *   ② Logo           — /dolar.png, appears dramatically on open
- *   ③ Perspective    — independent 3D space per corner
+ *   ② Perspective    — independent 3D space per corner   (z:2)
  *      └ fold-group  — CSS-animated -174° on .is-open
  *         ├ front    — card colour, backface-hidden
  *         └ back     — warm paper inside, backface-hidden
- *   ④ Drop shadow    — radial gradient, fades in on open
+ *   ③ Drop shadow    — radial gradient, fades in on open (z:3)
+ *   ④ Logo           — /dolar.png, ALWAYS ON TOP         (z:50)
  *
  * Logo technique: mix-blend-mode:multiply removes the cream bg,
  * leaving only the navy $ mark floating above the reveal.
@@ -92,92 +92,26 @@ export function FoldCorner({
         }}
       />
 
-      {/* ② Logo — appears after fold starts, exits before fold closes */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          /* sit tight in the top-right corner of the triangle */
-          top: sz * 0.04,
-          right: sz * 0.04,
-          width: logoSz,
-          height: logoSz,
-          clipPath: 'polygon(0 0, 100% 0, 100% 100%)',
-          zIndex: 2,
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'flex-end',
-        }}
-        initial={false}
-        animate={
-          isOpen
-            ? {
-                scale: 1,
-                opacity: 1,
-                rotate: 0,
-                filter: 'drop-shadow(0 0 6px rgba(201,168,76,0.55)) drop-shadow(0 2px 4px rgba(26,43,71,0.25))',
-              }
-            : {
-                scale: 0.25,
-                opacity: 0,
-                rotate: -25,
-                filter: 'drop-shadow(0 0 0px rgba(201,168,76,0))',
-              }
-        }
-        transition={
-          isOpen
-            ? {
-                /* Entrance: spring with bounce, starts after fold is ~30% open */
-                delay: 0.18,
-                type: 'spring',
-                stiffness: 380,
-                damping: 16,
-                mass: 0.7,
-              }
-            : {
-                /* Exit: fast fade out before fold closes */
-                duration: 0.12,
-                ease: 'easeIn',
-              }
-        }
-      >
-        {/* mix-blend-mode:multiply removes cream bg → only navy $ visible */}
-        <img
-          src="/dolar.png"
-          alt=""
-          width={logoSz}
-          height={logoSz}
-          style={{
-            width: logoSz,
-            height: logoSz,
-            objectFit: 'contain',
-            mixBlendMode: 'multiply',
-            display: 'block',
-          }}
-        />
-      </motion.div>
-
-      {/* ③ Perspective shell — independent vanishing point per corner */}
+      {/* ② Perspective shell — fold flap (front + back faces) */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           perspective: '280px',
           perspectiveOrigin: '0% 0%',
-          zIndex: 3,
+          zIndex: 2,
         }}
       >
         <div className={`fold-group${isOpen ? ' is-open' : ''}`}>
-          {/* Front face: card surface colour */}
           <div
             className="fold-face"
             style={{ backgroundColor: `rgba(${bgRgb}, 0.97)` }}
           />
-          {/* Back face: warm paper inside */}
           <div className="fold-face fold-face-back" style={backStyle} />
         </div>
       </div>
 
-      {/* ④ Drop shadow cast by lifted corner on card surface */}
+      {/* ③ Drop shadow cast by lifted corner */}
       <div
         style={{
           position: 'absolute',
@@ -185,7 +119,7 @@ export function FoldCorner({
           clipPath: 'polygon(0 0, 100% 0, 100% 100%)',
           opacity: isOpen ? 1 : 0,
           transition: 'opacity 0.35s ease',
-          zIndex: 4,
+          zIndex: 3,
           background: `radial-gradient(
             ellipse 85% 70% at 88% 12%,
             rgba(0,0,0,0.18) 0%,
@@ -195,6 +129,52 @@ export function FoldCorner({
           pointerEvents: 'none',
         }}
       />
+
+      {/* ④ Logo — LAST in DOM, highest z-index → nothing can cover it */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          top: sz * 0.05,
+          right: sz * 0.05,
+          width: logoSz,
+          height: logoSz,
+          zIndex: 50,
+          pointerEvents: 'none',
+        }}
+        initial={false}
+        animate={
+          isOpen
+            ? {
+                scale: 1,
+                opacity: 1,
+                rotate: 0,
+                filter: 'drop-shadow(0 0 6px rgba(201,168,76,0.60)) drop-shadow(0 2px 4px rgba(26,43,71,0.30))',
+              }
+            : {
+                scale: 0.2,
+                opacity: 0,
+                rotate: -30,
+                filter: 'drop-shadow(0 0 0px rgba(201,168,76,0))',
+              }
+        }
+        transition={
+          isOpen
+            ? { delay: 0.18, type: 'spring', stiffness: 380, damping: 16, mass: 0.7 }
+            : { duration: 0.10, ease: 'easeIn' }
+        }
+      >
+        <img
+          src="/dolar.png"
+          alt=""
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            mixBlendMode: 'multiply',
+            display: 'block',
+          }}
+        />
+      </motion.div>
     </div>
   )
 }
