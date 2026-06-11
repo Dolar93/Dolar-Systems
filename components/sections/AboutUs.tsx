@@ -17,17 +17,6 @@ const TEAM = [
     accentDark:  '#4A7A3A',
     darkRgb:     '74,122,58',
   },
-  {
-    photo: '/marek.png',
-    name: 'Marek Rybka',
-    role: 'Head of Business · Co-Founder',
-    bio: 'Head w AppChance — firma z portfolio aplikacji mobilnych dla klientów B2B. Doświadczenie w sprzedaży enterprise, kontakty w branży IT i prawnej. Ogarnia biznes żebym ja mógł ogarniać kod.',
-    badges: ['B2B Sales', 'AppChance', 'Mobile Apps', 'Enterprise'],
-    accentBg:    '#F2D4C8',
-    accentBgRgb: '242,212,200',
-    accentDark:  '#8B4A35',
-    darkRgb:     '139,74,53',
-  },
 ]
 
 const MANIFESTO = [
@@ -228,17 +217,19 @@ export default function AboutUs() {
     <section id="zespol" className="py-28" style={{ backgroundColor: '#F5F3EF' }}>
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="mb-14">
-          <SectionLabel number="04" label="ZESPÓŁ" />
+          <SectionLabel number="04" label="ZAŁOŻYCIEL" />
           <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(36px, 5vw, 48px)', fontWeight: 700, color: '#1A2B47', maxWidth: 600 }}>
             Nie sprzedajemy narzędzi.{' '}
             <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Wdrażamy systemy które działają.</span>
           </h2>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-          {TEAM.map((member, i) => (
-            <TeamCard key={member.name} member={member} index={i} />
-          ))}
+        <div className="flex justify-center mb-8">
+          <div className="w-full max-w-xl">
+            {TEAM.map((member, i) => (
+              <TeamCard key={member.name} member={member} index={i} />
+            ))}
+          </div>
         </div>
 
         <ManifestoCard />
