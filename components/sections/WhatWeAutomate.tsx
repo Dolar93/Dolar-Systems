@@ -1,20 +1,28 @@
 'use client'
 import { motion } from 'framer-motion'
-import { Globe, ShoppingBag, Clapperboard, Workflow, ArrowRight } from 'lucide-react'
+import { Globe, ShoppingBag, Clapperboard, Workflow, ArrowRight, Check } from 'lucide-react'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { Reveal } from '@/components/animations/reveal'
 import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
 
-/* ── Unified card style — one navy/gold system, no per-service hues ── */
-const CARD_STYLE = { bgRgb: '250,246,235', dark: '#1A2B47', darkRgb: '26,43,71', accent: '#C9A84C' }
+/* ── Curated accent palette — one deliberate colour per card, ──────
+   all tuned to sit next to the navy/gold base without turning
+   into a pastel post-it wall. */
+const ACCENTS = {
+  strony:        { c: '#C9A84C', rgb: '201,168,76'  }, // gold — flagship
+  sklepy:        { c: '#C1652F', rgb: '193,101,47'  }, // terracotta
+  ugc:           { c: '#1F7A6C', rgb: '31,122,108'  }, // teal
+  automatyzacje: { c: '#5B4B8A', rgb: '91,75,138'   }, // indigo
+}
+const NAVY = '26,43,71'
 
 const SERVICES = [
   {
     id: 'strony'        as const,
     num: '01', Icon: Globe,
     name: 'Strony Internetowe',
-    tasks: ['Premium design, wdrożenie w 24-48h', 'Next.js — szybkość i SEO od pierwszego dnia', 'Bez szablonów sprzed dekady', 'Panel do samodzielnej edycji treści'],
-    stack: ['Next.js', 'Framer Motion', 'Vercel'],
+    hook: 'Twoja strona ma więcej lat niż Twój najmłodszy pracownik?',
+    points: ['Nowa strona w 24–48h, bez czekania tygodniami', 'Ładuje się szybko i dobrze wygląda na telefonie', 'Sam zmienisz tekst czy zdjęcie, bez dzwonienia do nas'],
     gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: true,
     portfolio: { name: 'Moniquu Art', url: 'https://www.moniquuart.pl/' },
@@ -23,8 +31,8 @@ const SERVICES = [
     id: 'sklepy'        as const,
     num: '02', Icon: ShoppingBag,
     name: 'Sklepy Internetowe',
-    tasks: ['E-commerce od zera lub migracja', 'Wdrożenie sprzedaży na TikTok Shop', 'Płatności, magazyn, wysyłka — spięte', 'Integracja z Allegro/OLX'],
-    stack: ['Next.js', 'TikTok Shop', 'Stripe'],
+    hook: 'Chcesz sprzedawać, nie ogarniać oprogramowanie?',
+    points: ['Płatności, magazyn i wysyłka działają same', 'Wchodzimy z Tobą na TikTok Shop', 'Mniej klikania po zapleczu, więcej zamówień'],
     gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
   },
@@ -32,8 +40,8 @@ const SERVICES = [
     id: 'ugc'           as const,
     num: '03', Icon: Clapperboard,
     name: 'Reklamy AI (UGC Models)',
-    tasks: ['Masz produkt i nie wiesz jak go zareklamować?', 'AI-modelki nagrywają reklamy zamiast ekipy zdjęciowej', 'Gotowe wideo pod TikTok/IG/FB w kilka dni', 'Bez castingu, studia i logistyki zdjęciowej'],
-    stack: ['Higgsfield', 'Buffer'],
+    hook: 'Masz produkt i nie wiesz jak go pokazać?',
+    points: ['Nagrywamy reklamy bez ekipy i modelek', 'Gotowe wideo pod TikTok/IG/FB w kilka dni', 'Ty zajmujesz się produktem, my kreacją'],
     gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
   },
@@ -41,45 +49,15 @@ const SERVICES = [
     id: 'automatyzacje' as const,
     num: '04', Icon: Workflow,
     name: 'Automatyzacje jako usługa',
-    tasks: ['Koniec z ręcznym Excelem i copy-paste', 'Systemy klienta połączone ze sobą', 'AI recepcjonista/chatbot 24/7', 'Integracje CRM, ERP, e-mail w jednym'],
-    stack: ['n8n', 'Make.com', 'Claude AI'],
+    hook: 'Ile godzin tygodniowo zjada Ci Excel i kopiuj-wklej?',
+    points: ['Łączymy systemy, które dotąd ze sobą nie gadały', 'Zapytania klientów obsłużone, nawet gdy śpisz', 'Odzyskujesz czas — a nie dokładamy Ci pracy'],
     gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
   },
 ] as const
 
-
-/* ── 3D task block ─────────────────────────────────────────────── */
-function TaskBlock({ text, darkRgb, index }: { text: string; darkRgb: string; index: number }) {
-  const d = 2 + index * 0.6
-  return (
-    <div
-      style={{
-        backgroundColor: 'rgba(255,255,255,0.58)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-        borderRadius: '4px',
-        padding: '5px 9px',
-        fontSize: '12px',
-        fontFamily: 'var(--font-dm)',
-        color: `rgba(${darkRgb},0.90)`,
-        lineHeight: 1.4,
-        borderLeft: `2px solid rgba(${darkRgb},0.28)`,
-        boxShadow: `
-          ${d}px 0 0 rgba(${darkRgb},0.18),
-          0 ${d}px 0 rgba(${darkRgb},0.13),
-          ${d}px ${d}px 0 rgba(${darkRgb},0.11),
-          ${d + 2}px ${d + 2}px ${8 + index * 1.5}px rgba(0,0,0,0.07)
-        `,
-      }}
-    >
-      {text}
-    </div>
-  )
-}
-
 /* ── Live portfolio preview ────────────────────────────────────── */
-function PortfolioPreview({ name, url, darkRgb }: { name: string; url: string; darkRgb: string }) {
+function PortfolioPreview({ name, url, accentRgb }: { name: string; url: string; accentRgb: string }) {
   const host = url.replace(/^https?:\/\//, '').replace(/\/$/, '')
   return (
     <a
@@ -91,16 +69,16 @@ function PortfolioPreview({ name, url, darkRgb }: { name: string; url: string; d
       style={{
         borderRadius: '6px',
         overflow: 'hidden',
-        border: `1px solid rgba(${darkRgb},0.22)`,
-        backgroundColor: 'rgba(255,255,255,0.55)',
+        border: `1px solid rgba(${accentRgb},0.30)`,
+        backgroundColor: '#fff',
       }}
     >
       {/* Fake browser chrome bar */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1.5" style={{ borderBottom: `1px solid rgba(${darkRgb},0.15)` }}>
-        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${darkRgb},0.35)` }} />
-        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${darkRgb},0.25)` }} />
-        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${darkRgb},0.15)` }} />
-        <span className="ml-1.5 truncate" style={{ fontFamily: 'var(--font-ibm)', fontSize: '9px', color: `rgba(${darkRgb},0.65)` }}>
+      <div className="flex items-center gap-1.5 px-2.5 py-1.5" style={{ borderBottom: `1px solid rgba(${accentRgb},0.18)` }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${accentRgb},0.45)` }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${accentRgb},0.30)` }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${accentRgb},0.18)` }} />
+        <span className="ml-1.5 truncate" style={{ fontFamily: 'var(--font-ibm)', fontSize: '9px', color: `rgba(${NAVY},0.65)` }}>
           {host}
         </span>
       </div>
@@ -128,8 +106,8 @@ function PortfolioPreview({ name, url, darkRgb }: { name: string; url: string; d
 /* ── Service card ──────────────────────────────────────────────── */
 function Card({ item }: { item: (typeof SERVICES)[number] }) {
   const { hovered, ref: cardRef, handlers } = useCardFold()
-  const b = CARD_STYLE
   const { Icon } = item
+  const accent = ACCENTS[item.id]
   const foldSz = item.large ? 56 : 46
 
   return (
@@ -139,15 +117,17 @@ function Card({ item }: { item: (typeof SERVICES)[number] }) {
       <motion.div
         ref={cardRef}
         {...handlers}
-        className="h-full flex flex-col gap-3"
+        className="h-full flex flex-col gap-4"
         style={{
           position: 'relative',
-          backgroundColor: `rgba(${b.bgRgb},0.42)`,
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.60)',
-          borderRadius: '8px',
-          padding: item.large ? '20px' : '16px',
+          backgroundColor: '#FFFFFF',
+          backgroundImage: `radial-gradient(ellipse 420px 220px at 100% 0%, rgba(${accent.rgb},0.12), transparent 70%)`,
+          borderTop: `3px solid ${accent.c}`,
+          border: `1px solid rgba(${NAVY},0.08)`,
+          borderTopWidth: '3px',
+          borderTopColor: accent.c,
+          borderRadius: '10px',
+          padding: item.large ? '24px' : '20px',
           overflow: 'visible',
           transformOrigin: 'top center',
           transformStyle: 'preserve-3d',
@@ -161,22 +141,22 @@ function Card({ item }: { item: (typeof SERVICES)[number] }) {
           rotateX: hovered ? 1 : 6,
           y:       hovered ? -6 : 0,
           boxShadow: hovered
-            ? '4px 14px 32px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.06)'
-            : '2px 2px 0 rgba(0,0,0,0.05), 4px 4px 0 rgba(0,0,0,0.03), 6px 6px 16px rgba(0,0,0,0.07)',
+            ? `0 20px 40px rgba(${accent.rgb},0.18), 0 4px 10px rgba(0,0,0,0.06)`
+            : '2px 2px 0 rgba(0,0,0,0.04), 4px 4px 0 rgba(0,0,0,0.03), 6px 6px 20px rgba(0,0,0,0.06)',
         }}
       >
         {/* ── Origami corner fold (top-right) ── */}
-        <FoldCorner bgRgb={b.bgRgb} isOpen={hovered} sz={foldSz} />
+        <FoldCorner bgRgb="250,250,248" isOpen={hovered} sz={foldSz} />
 
         {/* Header */}
         <div className="flex items-center justify-between">
           <div
             className="flex items-center justify-center rounded-full flex-shrink-0"
-            style={{ width: 48, height: 48, backgroundColor: 'rgba(201,168,76,0.14)' }}
+            style={{ width: 48, height: 48, backgroundColor: `rgba(${accent.rgb},0.14)` }}
           >
-            <Icon size={item.large ? 24 : 20} style={{ color: b.accent }} />
+            <Icon size={item.large ? 24 : 20} style={{ color: accent.c }} />
           </div>
-          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: b.accent, opacity: 0.75, letterSpacing: '0.1em' }}>
+          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: accent.c, opacity: 0.85, letterSpacing: '0.1em' }}>
             [{item.num}]
           </span>
         </div>
@@ -184,42 +164,42 @@ function Card({ item }: { item: (typeof SERVICES)[number] }) {
         {/* Title */}
         <h3 style={{
           fontFamily: 'var(--font-playfair)',
-          fontSize: item.large ? '22px' : '17px',
+          fontSize: item.large ? '23px' : '18px',
           fontWeight: 700,
-          color: b.dark,
+          color: '#1A2B47',
           lineHeight: 1.2,
         }}>
           {item.name}
         </h3>
 
-        {/* 3D task blocks */}
-        <div className="flex flex-col gap-1.5 flex-1">
-          {item.tasks.map((task, i) => (
-            <TaskBlock key={task} text={task} darkRgb={b.darkRgb} index={i} />
+        {/* Hook — casual pain-point line, not a sales pitch */}
+        <p style={{
+          fontFamily: 'var(--font-dm)',
+          fontSize: '15px',
+          fontStyle: 'italic',
+          color: accent.c,
+          lineHeight: 1.5,
+          marginTop: '-8px',
+        }}>
+          {item.hook}
+        </p>
+
+        {/* Plain-language benefit list */}
+        <div className="flex flex-col gap-2 flex-1">
+          {item.points.map((point) => (
+            <div key={point} className="flex items-start gap-2">
+              <Check size={15} style={{ color: accent.c, flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontFamily: 'var(--font-dm)', fontSize: '13.5px', color: 'rgba(26,43,71,0.82)', lineHeight: 1.5 }}>
+                {point}
+              </span>
+            </div>
           ))}
         </div>
 
         {/* Real portfolio project, if any */}
         {item.portfolio && (
-          <PortfolioPreview name={item.portfolio.name} url={item.portfolio.url} darkRgb={b.darkRgb} />
+          <PortfolioPreview name={item.portfolio.name} url={item.portfolio.url} accentRgb={accent.rgb} />
         )}
-
-        {/* Stack badges */}
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          {item.stack.map((tech) => (
-            <span key={tech} style={{
-              fontFamily: 'var(--font-ibm)',
-              fontSize: '10px',
-              backgroundColor: 'rgba(255,255,255,0.50)',
-              border: '1px solid rgba(255,255,255,0.75)',
-              color: b.dark,
-              borderRadius: '3px',
-              padding: '2px 6px',
-            }}>
-              {tech}
-            </span>
-          ))}
-        </div>
 
         {/* CTA link */}
         <a
@@ -228,8 +208,9 @@ function Card({ item }: { item: (typeof SERVICES)[number] }) {
           style={{
             fontFamily: 'var(--font-ibm)',
             fontSize: '11px',
-            color: b.dark,
-            opacity: hovered ? 1 : 0.55,
+            fontWeight: 600,
+            color: accent.c,
+            opacity: hovered ? 1 : 0.75,
             letterSpacing: '0.08em',
           }}
           onClick={(e) => e.stopPropagation()}
@@ -266,7 +247,7 @@ export default function WhatWeAutomate() {
           </h2>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 auto-rows-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5 auto-rows-auto">
           {SERVICES.map((item) => (
             <Card key={item.id} item={item} />
           ))}
