@@ -3,6 +3,7 @@ import Footer from '@/components/ui/Footer'
 import FloatingPaper from '@/components/ui/FloatingPaper'
 import Hero from '@/components/sections/Hero'
 import WhatWeAutomate from '@/components/sections/WhatWeAutomate'
+import ProfitChart from '@/components/sections/ProfitChart'
 import CaseStudies from '@/components/sections/CaseStudies'
 import AboutUs from '@/components/sections/AboutUs'
 import Contact from '@/components/sections/Contact'
@@ -15,6 +16,7 @@ export default function Home() {
       <main style={{ position: 'relative', zIndex: 1 }}>
         <Hero />
         <WhatWeAutomate />
+        <ProfitChart />
         <CaseStudies />
         <AboutUs />
         <Contact />
