@@ -1,9 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ContainerScroll } from '@/components/ui/container-scroll-animation'
 import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
-import { ParticleTextEffect } from '@/components/ui/particle-text-effect'
 
 /* ── Rotating kicker ────────────────────────────────────────────── */
 const KICKER_WORDS = ['PRZYSZŁOŚĆ', 'ROZWÓJ', 'BIZNES']
@@ -261,14 +259,9 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
-      <ContainerScroll titleComponent={<HeroTitle />}>
-        <div className="w-full h-full" style={{ borderRadius: '18px', overflow: 'hidden' }}>
-          <ParticleTextEffect
-            words={['DOLAR SYSTEMS', 'PRZYSZŁOŚĆ', 'ROZWÓJ', 'TWOJEJ FIRMY']}
-            holdFrames={110}
-          />
-        </div>
-      </ContainerScroll>
+      <div className="max-w-5xl mx-auto px-6 pt-40 pb-24">
+        <HeroTitle />
+      </div>
     </section>
   )
 }
