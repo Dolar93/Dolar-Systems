@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Text, Line } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
 /* ── Data: illustrative growth in monthly savings after automation ── */
@@ -15,105 +15,153 @@ const DATA = [
   { label: 'M6', value: 19.8 },
 ]
 const MAX_VALUE = 21
-const BAR_H = 4
-const SPACING = 1.2
-const GOLD = '#C9A84C'
-const NAVY = '#1A2B47'
-const CREAM = '#F5F3EF'
-const MUTED = '#8A9AB5'
+const SPAN_X = 7.2
+const HEIGHT = 3.6
 
-function barX(i: number) {
-  return (i - (DATA.length - 1) / 2) * SPACING
-}
-function barHeight(value: number) {
-  return (value / MAX_VALUE) * BAR_H + 0.1
+function dataPoint(i: number) {
+  const t = i / (DATA.length - 1)
+  const x = -SPAN_X / 2 + t * SPAN_X
+  const y = (DATA[i].value / MAX_VALUE) * HEIGHT
+  return new THREE.Vector3(x, y, 0)
 }
 
-/* ── Single animated column ──────────────────────────────────────── */
-function Bar({ index, value, started }: { index: number; value: number; started: boolean }) {
-  const meshRef = useRef<THREE.Mesh>(null)
-  const t0 = useRef<number | null>(null)
-  const targetH = barHeight(value)
-  const x = barX(index)
+/* ── Soft circular sprite, drawn on an offscreen canvas — no network
+   font/texture fetch, so it can never silently fail to load. ────── */
+function useStarSprite() {
+  return useMemo(() => {
+    const size = 64
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const ctx = canvas.getContext('2d')!
+    const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+    g.addColorStop(0, 'rgba(255,255,255,1)')
+    g.addColorStop(0.4, 'rgba(255,255,255,0.6)')
+    g.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, size, size)
+    const tex = new THREE.CanvasTexture(canvas)
+    tex.needsUpdate = true
+    return tex
+  }, [])
+}
 
-  useFrame(({ clock }) => {
-    if (!meshRef.current || !started) return
-    if (t0.current === null) t0.current = clock.getElapsedTime()
-    const raw = (clock.getElapsedTime() - t0.current - index * 0.09) / 0.85
-    const t = Math.min(Math.max(raw, 0), 1)
-    const eased = 1 - Math.pow(1 - t, 3)
-    meshRef.current.scale.y = Math.max(eased, 0.001)
-    meshRef.current.position.y = (targetH * eased) / 2
+/* ── Ambient background starfield ─────────────────────────────────── */
+function Starfield({ sprite }: { sprite: THREE.Texture }) {
+  const ref = useRef<THREE.Points>(null)
+  const positions = useMemo(() => {
+    const n = 500
+    const arr = new Float32Array(n * 3)
+    for (let i = 0; i < n; i++) {
+      arr[i * 3 + 0] = (Math.random() - 0.5) * 24
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 14 + 1.5
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 14 - 2
+    }
+    return arr
+  }, [])
+
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.y += delta * 0.012
   })
 
   return (
-    <group>
-      <mesh ref={meshRef} position={[x, 0.001, 0]}>
-        <boxGeometry args={[0.72, targetH, 0.72]} />
-        <meshStandardMaterial color={GOLD} metalness={0.4} roughness={0.35} />
-      </mesh>
-      <Text position={[x, targetH + 0.42, 0]} fontSize={0.26} color={NAVY} anchorX="center" anchorY="middle" font={undefined}>
-        {value.toFixed(1)}k zł
-      </Text>
-      <Text position={[x, -0.38, 0.5]} fontSize={0.2} color={MUTED} anchorX="center" anchorY="middle">
-        {DATA[index].label}
-      </Text>
-    </group>
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        map={sprite}
+        size={0.08}
+        sizeAttenuation
+        transparent
+        opacity={0.5}
+        color="#F5F3EF"
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
   )
 }
 
-/* ── Growth line connecting bar tops, fades in once bars settle ──── */
-function GrowthLine({ started }: { started: boolean }) {
-  const [visible, setVisible] = useState(false)
-  useEffect(() => {
-    if (!started) return
-    const id = setTimeout(() => setVisible(true), 1300)
-    return () => clearTimeout(id)
-  }, [started])
+/* ── The growth line, made of stars ──────────────────────────────── */
+function ChartStars({ sprite, started }: { sprite: THREE.Texture; started: boolean }) {
+  const geomRef = useRef<THREE.BufferGeometry>(null)
+  const t0 = useRef<number | null>(null)
 
-  const points = useMemo(
-    () => DATA.map((d, i) => new THREE.Vector3(barX(i), barHeight(d.value) + 0.2, 0)),
-    [],
-  )
+  const curvePoints = useMemo(() => {
+    const curve = new THREE.CatmullRomCurve3(DATA.map((_, i) => dataPoint(i)))
+    return curve.getPoints(140)
+  }, [])
 
-  if (!visible) return null
-  return <Line points={points} color={CREAM} lineWidth={2} transparent opacity={0.85} />
-}
+  const positions = useMemo(() => {
+    const arr = new Float32Array(curvePoints.length * 3)
+    curvePoints.forEach((p, i) => {
+      arr[i * 3 + 0] = p.x
+      arr[i * 3 + 1] = p.y
+      arr[i * 3 + 2] = p.z
+    })
+    return arr
+  }, [curvePoints])
 
-/* ── Floor grid, matches the site's grid-pulse motif ─────────────── */
-function Floor() {
+  useFrame(({ clock }) => {
+    if (!geomRef.current) return
+    if (!started) {
+      geomRef.current.setDrawRange(0, 0)
+      return
+    }
+    if (t0.current === null) t0.current = clock.getElapsedTime()
+    const t = Math.min((clock.getElapsedTime() - t0.current) / 2.4, 1)
+    geomRef.current.setDrawRange(0, Math.floor(t * curvePoints.length))
+  })
+
   return (
-    <group position={[0, 0, 0]}>
-      <gridHelper args={[9, 18, '#3D4F6B', '#3D4F6B']} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
-        <planeGeometry args={[9, 9]} />
-        <meshBasicMaterial color={NAVY} transparent opacity={0.35} />
-      </mesh>
-    </group>
+    <>
+      <points>
+        <bufferGeometry ref={geomRef}>
+          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          map={sprite}
+          size={0.17}
+          sizeAttenuation
+          transparent
+          opacity={0.95}
+          color="#C9A84C"
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </points>
+
+      {started &&
+        DATA.map((d, i) => (
+          <mesh key={d.label} position={dataPoint(i)}>
+            <sphereGeometry args={[0.1, 16, 16]} />
+            <meshBasicMaterial color="#FFF6DE" />
+          </mesh>
+        ))}
+    </>
   )
 }
 
 function Scene({ started }: { started: boolean }) {
+  const sprite = useStarSprite()
   return (
     <>
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[3, 5, 2]} intensity={1.1} color="#FFF4D6" />
-      <directionalLight position={[-3, 2, -2]} intensity={0.3} color="#C9A84C" />
+      <color attach="background" args={['#070B18']} />
+      <fog attach="fog" args={['#070B18', 9, 22]} />
+      <ambientLight intensity={0.4} />
 
-      <Floor />
-      {DATA.map((d, i) => (
-        <Bar key={d.label} index={i} value={d.value} started={started} />
-      ))}
-      <GrowthLine started={started} />
+      <Starfield sprite={sprite} />
+      <ChartStars sprite={sprite} started={started} />
 
       <OrbitControls
         enableZoom={false}
         enablePan={false}
         autoRotate
-        autoRotateSpeed={0.7}
-        maxPolarAngle={Math.PI / 2.15}
-        minPolarAngle={Math.PI / 4}
-        target={[0, 1, 0]}
+        autoRotateSpeed={0.5}
+        maxPolarAngle={Math.PI / 1.6}
+        minPolarAngle={Math.PI / 3.2}
+        target={[0, 1.3, 0]}
       />
     </>
   )
@@ -153,9 +201,6 @@ export function ProfitChart3D() {
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     window.addEventListener('resize', measure)
-    // Nudge react-three-fiber's own resize detection — in some environments
-    // its internal ResizeObserver never fires on first mount, leaving the
-    // canvas stuck at its default 300x150 drawing buffer.
     const nudge = setTimeout(() => window.dispatchEvent(new Event('resize')), 50)
     return () => { ro.disconnect(); window.removeEventListener('resize', measure); clearTimeout(nudge) }
   }, [])
@@ -165,8 +210,8 @@ export function ProfitChart3D() {
       {size && (
         <Canvas
           style={{ width: size.w, height: size.h, display: 'block' }}
-          camera={{ position: [4.2, 3.1, 6], fov: 40 }}
-          gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
+          camera={{ position: [5, 2.6, 8], fov: 45 }}
+          gl={{ alpha: false, antialias: true, powerPreference: 'high-performance' }}
           dpr={[1, 1.5]}
         >
           <Scene started={started} />

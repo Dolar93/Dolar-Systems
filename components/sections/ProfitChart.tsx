@@ -11,7 +11,7 @@ const ProfitChart3D = dynamic(
 
 const LEGEND = [
   { Icon: TrendingUp, text: 'Szacunek na bazie wdrożeń z Realizacji poniżej' },
-  { Icon: RotateCcw, text: 'Przeciągnij, żeby obejrzeć z każdej strony' },
+  { Icon: RotateCcw, text: 'Przeciągnij, żeby obrócić konstelację' },
   { Icon: ShieldCheck, text: 'Bez zgadywania — konkretna wycena po analizie' },
 ]
 
@@ -22,8 +22,8 @@ export default function ProfitChart() {
         <Reveal className="mb-12">
           <SectionLabel number="03" label="REALNE ZYSKI" />
           <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(34px, 5vw, 46px)', fontWeight: 700, color: '#1A2B47', maxWidth: 560 }}>
-            Wzrost, który widać.{' '}
-            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Nie obietnice — liczby.</span>
+            Twój wzrost.{' '}
+            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Ułożony w gwiazdy.</span>
           </h2>
           <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#8A9AB5', marginTop: '0.75rem', maxWidth: 520 }}>
             Tak rosną oszczędności typowego klienta w pierwszych 6 miesiącach po wdrożeniu automatyzacji.
