@@ -5,24 +5,54 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-/* ── Data: illustrative growth in monthly savings after automation ── */
-const DATA = [
-  { label: 'M1', value: 2.4 },
-  { label: 'M2', value: 5.2 },
-  { label: 'M3', value: 8.6 },
-  { label: 'M4', value: 12.1 },
-  { label: 'M5', value: 15.9 },
-  { label: 'M6', value: 19.8 },
-]
-const MAX_VALUE = 21
-const SPAN_X = 7.2
-const HEIGHT = 3.6
+const NODE_COUNT = 240
+const NEIGHBORS = 4 // edges per node — keeps the mesh dense but legible
 
-function dataPoint(i: number) {
-  const t = i / (DATA.length - 1)
-  const x = -SPAN_X / 2 + t * SPAN_X
-  const y = (DATA[i].value / MAX_VALUE) * HEIGHT
-  return new THREE.Vector3(x, y, 0)
+/* ── Brain-shaped node cloud: two overlapping lobes, points biased
+   toward the outer shell so it reads as a folded cortex rather than
+   a solid random blob. ──────────────────────────────────────────── */
+function generateBrainNodes(count: number): THREE.Vector3[] {
+  const pts: THREE.Vector3[] = []
+  const ax = 1.55, ay = 1.05, az = 1.3
+  for (let i = 0; i < count; i++) {
+    const side = i % 2 === 0 ? -1 : 1
+    const u = Math.random()
+    const v = Math.random()
+    const theta = 2 * Math.PI * u
+    const phi = Math.acos(2 * v - 1)
+    const rShell = 0.5 + Math.random() * 0.5
+    const sx = Math.sin(phi) * Math.cos(theta)
+    const sy = Math.sin(phi) * Math.sin(theta)
+    const sz = Math.cos(phi)
+    pts.push(
+      new THREE.Vector3(
+        side * 0.5 + sx * ax * rShell,
+        sy * ay * rShell * 0.85 + 0.25,
+        sz * az * rShell,
+      ),
+    )
+  }
+  return pts
+}
+
+/* ── Connect each node to its k nearest neighbours — bounded edge
+   count, reads as an organised network rather than a hairball. ──── */
+function buildEdges(nodes: THREE.Vector3[], k: number): [number, number][] {
+  const edges = new Set<string>()
+  for (let i = 0; i < nodes.length; i++) {
+    const dists = nodes
+      .map((p, j) => ({ j, d: i === j ? Infinity : nodes[i].distanceTo(p) }))
+      .sort((a, b) => a.d - b.d)
+      .slice(0, k)
+    for (const { j } of dists) {
+      const key = i < j ? `${i}-${j}` : `${j}-${i}`
+      edges.add(key)
+    }
+  }
+  return [...edges].map((key) => {
+    const [a, b] = key.split('-').map(Number)
+    return [a, b]
+  })
 }
 
 /* ── Soft circular sprite, drawn on an offscreen canvas — no network
@@ -83,63 +113,92 @@ function Starfield({ sprite }: { sprite: THREE.Texture }) {
   )
 }
 
-/* ── The growth line, made of stars ──────────────────────────────── */
-function ChartStars({ sprite, started }: { sprite: THREE.Texture; started: boolean }) {
-  const geomRef = useRef<THREE.BufferGeometry>(null)
+/* ── The neural network — nodes + synapses, forming a brain shape ── */
+function NeuralBrain({ sprite, started }: { sprite: THREE.Texture; started: boolean }) {
+  const groupRef = useRef<THREE.Group>(null)
+  const edgeMatRef = useRef<THREE.LineBasicMaterial>(null)
+  const nodeMatRef = useRef<THREE.PointsMaterial>(null)
   const t0 = useRef<number | null>(null)
 
-  const curvePoints = useMemo(() => {
-    const curve = new THREE.CatmullRomCurve3(DATA.map((_, i) => dataPoint(i)))
-    return curve.getPoints(140)
-  }, [])
+  const nodes = useMemo(() => generateBrainNodes(NODE_COUNT), [])
+  const edges = useMemo(() => buildEdges(nodes, NEIGHBORS), [nodes])
 
-  const positions = useMemo(() => {
-    const arr = new Float32Array(curvePoints.length * 3)
-    curvePoints.forEach((p, i) => {
+  const nodePositions = useMemo(() => {
+    const arr = new Float32Array(nodes.length * 3)
+    nodes.forEach((p, i) => {
       arr[i * 3 + 0] = p.x
       arr[i * 3 + 1] = p.y
       arr[i * 3 + 2] = p.z
     })
     return arr
-  }, [curvePoints])
+  }, [nodes])
+
+  const edgePositions = useMemo(() => {
+    const arr = new Float32Array(edges.length * 2 * 3)
+    edges.forEach(([a, b], i) => {
+      const pa = nodes[a]
+      const pb = nodes[b]
+      arr[i * 6 + 0] = pa.x; arr[i * 6 + 1] = pa.y; arr[i * 6 + 2] = pa.z
+      arr[i * 6 + 3] = pb.x; arr[i * 6 + 4] = pb.y; arr[i * 6 + 5] = pb.z
+    })
+    return arr
+  }, [nodes, edges])
 
   useFrame(({ clock }) => {
-    if (!geomRef.current) return
+    if (!groupRef.current || !edgeMatRef.current || !nodeMatRef.current) return
+    const el = clock.getElapsedTime()
+
     if (!started) {
-      geomRef.current.setDrawRange(0, 0)
+      groupRef.current.scale.setScalar(0.001)
+      edgeMatRef.current.opacity = 0
+      nodeMatRef.current.opacity = 0
       return
     }
-    if (t0.current === null) t0.current = clock.getElapsedTime()
-    const t = Math.min((clock.getElapsedTime() - t0.current) / 2.4, 1)
-    geomRef.current.setDrawRange(0, Math.floor(t * curvePoints.length))
+    if (t0.current === null) t0.current = el
+    const t = Math.min((el - t0.current) / 1.4, 1)
+    const eased = 1 - Math.pow(1 - t, 3)
+    groupRef.current.scale.setScalar(0.35 + eased * 0.65)
+
+    const breathe = Math.sin(el * 0.9) * 0.08
+    edgeMatRef.current.opacity = eased * (0.4 + breathe)
+    nodeMatRef.current.opacity = eased * (0.95 + breathe * 0.4)
+
+    groupRef.current.rotation.y += 0.0016
   })
 
   return (
-    <>
+    <group ref={groupRef}>
+      <lineSegments>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[edgePositions, 3]} />
+        </bufferGeometry>
+        <lineBasicMaterial
+          ref={edgeMatRef}
+          color="#C9A84C"
+          transparent
+          opacity={0}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </lineSegments>
+
       <points>
-        <bufferGeometry ref={geomRef}>
-          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[nodePositions, 3]} />
         </bufferGeometry>
         <pointsMaterial
+          ref={nodeMatRef}
           map={sprite}
-          size={0.17}
+          size={0.15}
           sizeAttenuation
           transparent
-          opacity={0.95}
-          color="#C9A84C"
+          opacity={0}
+          color="#FFF6DE"
           depthWrite={false}
           blending={THREE.AdditiveBlending}
         />
       </points>
-
-      {started &&
-        DATA.map((d, i) => (
-          <mesh key={d.label} position={dataPoint(i)}>
-            <sphereGeometry args={[0.1, 16, 16]} />
-            <meshBasicMaterial color="#FFF6DE" />
-          </mesh>
-        ))}
-    </>
+    </group>
   )
 }
 
@@ -152,7 +211,7 @@ function Scene({ started }: { started: boolean }) {
       <ambientLight intensity={0.4} />
 
       <Starfield sprite={sprite} />
-      <ChartStars sprite={sprite} started={started} />
+      <NeuralBrain sprite={sprite} started={started} />
 
       <OrbitControls
         enableZoom={false}
@@ -161,7 +220,7 @@ function Scene({ started }: { started: boolean }) {
         autoRotateSpeed={0.5}
         maxPolarAngle={Math.PI / 1.6}
         minPolarAngle={Math.PI / 3.2}
-        target={[0, 1.3, 0]}
+        target={[0, 0.3, 0]}
       />
     </>
   )
@@ -210,7 +269,7 @@ export function ProfitChart3D() {
       {size && (
         <Canvas
           style={{ width: size.w, height: size.h, display: 'block' }}
-          camera={{ position: [5, 2.6, 8], fov: 45 }}
+          camera={{ position: [4.6, 1.9, 6.6], fov: 42 }}
           gl={{ alpha: false, antialias: true, powerPreference: 'high-performance' }}
           dpr={[1, 1.5]}
         >

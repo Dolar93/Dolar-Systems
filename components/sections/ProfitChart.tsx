@@ -1,6 +1,6 @@
 'use client'
 import dynamic from 'next/dynamic'
-import { RotateCcw, TrendingUp, ShieldCheck } from 'lucide-react'
+import { RotateCcw, BrainCircuit, ShieldCheck } from 'lucide-react'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { Reveal } from '@/components/animations/reveal'
 
@@ -10,8 +10,8 @@ const ProfitChart3D = dynamic(
 )
 
 const LEGEND = [
-  { Icon: TrendingUp, text: 'Szacunek na bazie wdrożeń z Realizacji poniżej' },
-  { Icon: RotateCcw, text: 'Przeciągnij, żeby obrócić konstelację' },
+  { Icon: BrainCircuit, text: 'Setki połączeń — tak wygląda system po automatyzacji' },
+  { Icon: RotateCcw, text: 'Przeciągnij, żeby obrócić sieć' },
   { Icon: ShieldCheck, text: 'Bez zgadywania — konkretna wycena po analizie' },
 ]
 
@@ -20,13 +20,13 @@ export default function ProfitChart() {
     <section id="zyski" className="py-28" style={{ backgroundColor: '#F5F3EF' }}>
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="mb-12">
-          <SectionLabel number="03" label="REALNE ZYSKI" />
+          <SectionLabel number="03" label="POD SPODEM" />
           <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(34px, 5vw, 46px)', fontWeight: 700, color: '#1A2B47', maxWidth: 560 }}>
-            Twój wzrost.{' '}
-            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Ułożony w gwiazdy.</span>
+            Wygląda prosto.{' '}
+            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Pracuje jak sieć.</span>
           </h2>
           <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: '#8A9AB5', marginTop: '0.75rem', maxWidth: 520 }}>
-            Tak rosną oszczędności typowego klienta w pierwszych 6 miesiącach po wdrożeniu automatyzacji.
+            Twoja firma widzi jeden dashboard. Pod spodem pracują setki połączonych ze sobą procesów — 24/7, bez przerw na kawę.
           </p>
         </Reveal>
 
