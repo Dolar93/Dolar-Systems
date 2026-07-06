@@ -161,3 +161,9 @@ body::before {
 .paper-wrinkle {
   animation: paper-tension 0.62s ease-out;
 }
+
+/* ── Grid-pulse background (dark hero variant) ───────────────────── */
+@keyframes cell-pulse {
+  from { opacity: var(--opacity-min); }
+  to   { opacity: var(--opacity-max); }
+}

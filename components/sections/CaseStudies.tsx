@@ -31,7 +31,7 @@ const CASES = [
     metrics: [{ num: 15, suffix: 'h', prefix: '–', label: 'tygodniowo' }, { num: 40, suffix: '%', prefix: '+', label: 'follow-up' }],
     effects: ['–15h tygodniowo pracy manualnej', '+40% skuteczność follow-up', '0 zapomnianych klientów'],
     price: '4 900', time: '3 tygodnie',
-    strip: '#D4E4C8', stripDark: '#4A7A3A', badgeBg: 'rgba(212,228,200,0.6)',
+    strip: '#C9A84C', stripDark: '#1A2B47', badgeBg: 'rgba(201,168,76,0.16)',
   },
   {
     num: '002', Icon: Stethoscope,
@@ -41,7 +41,7 @@ const CASES = [
     metrics: [{ num: 62, suffix: '%', prefix: '–', label: 'no-show' }, { num: 25, suffix: '%', prefix: '+', label: 'kalendarza' }],
     effects: ['–62% no-show rate', '+25% zapełnienie kalendarza', 'Recepcja odciążona o 8h/tydzień'],
     price: '5 900', time: '2 tygodnie',
-    strip: '#F2D4C8', stripDark: '#8B4A35', badgeBg: 'rgba(242,212,200,0.6)',
+    strip: '#C9A84C', stripDark: '#1A2B47', badgeBg: 'rgba(201,168,76,0.16)',
   },
   {
     num: '003', Icon: Landmark,
@@ -51,7 +51,7 @@ const CASES = [
     metrics: [{ num: 0, suffix: 'h', prefix: '', label: 'raportowania' }, { num: 35, suffix: '%', prefix: '+', label: 'konwersja' }],
     effects: ['0h raportowania manualnego', 'Zarząd ma dane real-time', '+35% konwersja leadów'],
     price: '6 900', time: '4 tygodnie',
-    strip: '#E8DCC8', stripDark: '#6B4A1A', badgeBg: 'rgba(232,220,200,0.6)',
+    strip: '#C9A84C', stripDark: '#1A2B47', badgeBg: 'rgba(201,168,76,0.16)',
   },
 ]
 

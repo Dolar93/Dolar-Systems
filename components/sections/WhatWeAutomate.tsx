@@ -5,13 +5,8 @@ import SectionLabel from '@/components/ui/SectionLabel'
 import { Reveal } from '@/components/animations/reveal'
 import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
 
-/* ── Brand config ──────────────────────────────────────────────── */
-const BRAND = {
-  strony:        { bgRgb: '212,228,200', dark: '#4A7A3A', darkRgb: '74,122,58'  },
-  sklepy:        { bgRgb: '242,212,200', dark: '#8B4A35', darkRgb: '139,74,53'  },
-  ugc:           { bgRgb: '212,200,232', dark: '#4A2A6B', darkRgb: '74,42,107'  },
-  automatyzacje: { bgRgb: '200,212,232', dark: '#2A4A6B', darkRgb: '42,74,107'  },
-}
+/* ── Unified card style — one navy/gold system, no per-service hues ── */
+const CARD_STYLE = { bgRgb: '250,246,235', dark: '#1A2B47', darkRgb: '26,43,71', accent: '#C9A84C' }
 
 const SERVICES = [
   {
@@ -83,20 +78,6 @@ function TaskBlock({ text, darkRgb, index }: { text: string; darkRgb: string; in
   )
 }
 
-/* ── Origami bird ─────────────────────────────────────────────── */
-function OrigamiBird({ color, size = 32, rotate = 0, opacity = 0.28 }: {
-  color: string; size?: number; rotate?: number; opacity?: number
-}) {
-  return (
-    <svg viewBox="0 0 40 30" width={size} height={size * 0.75}
-      style={{ color, transform: `rotate(${rotate}deg)`, opacity }} aria-hidden>
-      <polygon points="0,30 20,0 40,30"  fill="currentColor" opacity="0.4" />
-      <polygon points="20,0 40,30 20,20" fill="currentColor" opacity="0.6" />
-      <polygon points="0,30 20,20 10,30" fill="currentColor" opacity="0.3" />
-    </svg>
-  )
-}
-
 /* ── Live portfolio preview ────────────────────────────────────── */
 function PortfolioPreview({ name, url, darkRgb }: { name: string; url: string; darkRgb: string }) {
   const host = url.replace(/^https?:\/\//, '').replace(/\/$/, '')
@@ -147,7 +128,7 @@ function PortfolioPreview({ name, url, darkRgb }: { name: string; url: string; d
 /* ── Service card ──────────────────────────────────────────────── */
 function Card({ item }: { item: (typeof SERVICES)[number] }) {
   const { hovered, ref: cardRef, handlers } = useCardFold()
-  const b = BRAND[item.id]
+  const b = CARD_STYLE
   const { Icon } = item
   const foldSz = item.large ? 56 : 46
 
@@ -191,11 +172,11 @@ function Card({ item }: { item: (typeof SERVICES)[number] }) {
         <div className="flex items-center justify-between">
           <div
             className="flex items-center justify-center rounded-full flex-shrink-0"
-            style={{ width: 48, height: 48, backgroundColor: 'rgba(255,255,255,0.50)' }}
+            style={{ width: 48, height: 48, backgroundColor: 'rgba(201,168,76,0.14)' }}
           >
-            <Icon size={item.large ? 24 : 20} style={{ color: b.dark }} />
+            <Icon size={item.large ? 24 : 20} style={{ color: b.accent }} />
           </div>
-          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: b.dark, opacity: 0.5, letterSpacing: '0.1em' }}>
+          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: b.accent, opacity: 0.75, letterSpacing: '0.1em' }}>
             [{item.num}]
           </span>
         </div>
@@ -261,16 +242,6 @@ function Card({ item }: { item: (typeof SERVICES)[number] }) {
   )
 }
 
-/* ── Background birds ──────────────────────────────────────────── */
-const BIRDS = [
-  { color: '#4A7A3A', size: 44, rotate: -15, left: '1%',  top: '8%'  },
-  { color: '#8B4A35', size: 28, rotate: 25,  left: '95%', top: '16%' },
-  { color: '#2A4A6B', size: 52, rotate: -5,  left: '47%', top: '2%'  },
-  { color: '#6B4A1A', size: 26, rotate: 40,  left: '87%', top: '68%' },
-  { color: '#4A2A6B', size: 40, rotate: -20, left: '4%',  top: '75%' },
-  { color: '#4A7A3A', size: 22, rotate: 10,  left: '73%', top: '90%' },
-]
-
 /* ── Section ─────────────────────────────────────────────────────── */
 export default function WhatWeAutomate() {
   return (
@@ -278,24 +249,14 @@ export default function WhatWeAutomate() {
       id="zakres"
       className="relative py-28 overflow-hidden"
       style={{
-        background: `
-          radial-gradient(circle at 20% 20%, rgba(212,228,200,0.30) 0%, transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(212,200,232,0.30) 0%, transparent 50%),
-          radial-gradient(circle at 60% 30%, rgba(242,212,200,0.20) 0%, transparent 40%),
-          #F5F3EF
+        backgroundColor: '#F5F3EF',
+        backgroundImage: `
+          linear-gradient(rgba(26,43,71,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(26,43,71,0.05) 1px, transparent 1px)
         `,
+        backgroundSize: '48px 48px',
       }}
     >
-      {BIRDS.map((b, i) => (
-        <motion.div key={i} className="absolute pointer-events-none"
-          style={{ left: b.left, top: b.top }}
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 4 + i * 0.7, repeat: Infinity, delay: i * 0.8, ease: 'easeInOut' }}
-        >
-          <OrigamiBird color={b.color} size={b.size} rotate={b.rotate} />
-        </motion.div>
-      ))}
-
       <div className="relative max-w-7xl mx-auto px-6" style={{ zIndex: 1 }}>
         <Reveal className="mb-12">
           <SectionLabel number="02" label="ZAKRES USŁUG" />

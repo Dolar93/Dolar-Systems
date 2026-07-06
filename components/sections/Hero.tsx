@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
+import { GridPulseBackground } from '@/components/ui/grid-pulse-background'
 
 /* ── Rotating kicker ────────────────────────────────────────────── */
 const KICKER_WORDS = ['PRZYSZŁOŚĆ', 'ROZWÓJ', 'BIZNES']
@@ -70,63 +71,30 @@ function Seal() {
   )
 }
 
-/* ── Floating paper cards in background ─────────────────────────── */
-const FLOATING_CARDS = [
-  { bg: '#D4E4C8', w: 120, h: 160, rot: -8,  right: '15%', top: '20%', dur: 6,   delay: 0, rotAnim: [2, 4, 2]   },
-  { bg: '#F2D4C8', w: 80,  h: 110, rot: 12,  right: '25%', top: '35%', dur: 7,   delay: 2, rotAnim: [12, 14, 12] },
-  { bg: '#C8D4E8', w: 100, h: 140, rot: -3,  right: '10%', top: '45%', dur: 8,   delay: 4, rotAnim: [-3, -1, -3] },
-]
-
-function FloatingCards() {
-  return (
-    <>
-      {FLOATING_CARDS.map((c, i) => (
-        <motion.div
-          key={i}
-          style={{
-            position: 'absolute',
-            right: c.right,
-            top: c.top,
-            width: c.w,
-            height: c.h,
-            backgroundColor: c.bg,
-            borderRadius: '6px',
-            rotate: c.rot,
-            boxShadow: '4px 8px 20px rgba(0,0,0,0.10)',
-            zIndex: 2,
-          }}
-          animate={{ y: [0, -15, 0], rotate: c.rotAnim }}
-          transition={{ duration: c.dur, repeat: Infinity, ease: 'easeInOut', delay: c.delay }}
-          aria-hidden
-        />
-      ))}
-    </>
-  )
-}
-
-/* ── Stat card with fold ───────────────────────────────────────── */
+/* ── Stat card with fold (dark-glass variant) ───────────────────── */
 function StatCard({ val, label }: { val: string; label: string }) {
   const { hovered, ref, handlers } = useCardFold()
   return (
     <div className="flex-1" style={{ position: 'relative' }}>
-      <FoldCorner isOpen={hovered} sz={32} bgRgb="250,250,248" />
+      <FoldCorner isOpen={hovered} sz={32} bgRgb="30,46,74" />
       <div
         ref={ref}
         {...handlers}
-        className="p-5 text-center paper-texture"
+        className="p-5 text-center"
         style={{
-          backgroundColor: '#FAFAF8',
-          border: '1px solid rgba(26,43,71,0.10)',
+          backgroundColor: 'rgba(255,255,255,0.05)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          border: '1px solid rgba(245,243,239,0.14)',
           borderRadius: '8px',
           overflow: 'hidden',
-          boxShadow: hovered
-            ? '4px 10px 24px rgba(0,0,0,0.12)'
-            : '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)',
-          transition: 'box-shadow 0.3s ease, transform 0.25s ease',
+          boxShadow: hovered ? '0 10px 28px rgba(0,0,0,0.35)' : 'none',
+          transition: 'box-shadow 0.3s ease, transform 0.25s ease, border-color 0.25s ease',
           transform: hovered ? 'translateY(-3px)' : 'none',
+          borderColor: hovered ? 'rgba(201,168,76,0.45)' : 'rgba(245,243,239,0.14)',
         }}
       >
-        <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '28px', fontWeight: 700, color: '#1A2B47', lineHeight: 1, marginBottom: '4px' }}>
+        <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '28px', fontWeight: 700, color: '#F5F3EF', lineHeight: 1, marginBottom: '4px' }}>
           {val}
         </div>
         <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#8A9AB5', letterSpacing: '0.18em' }}>
@@ -157,10 +125,10 @@ function HeroTitle() {
         className="mb-7"
         style={{ lineHeight: 1.05 }}
       >
-        <span style={{ display: 'block', fontFamily: 'var(--font-playfair)', fontSize: 'clamp(52px, 7vw, 80px)', fontWeight: 700, fontStyle: 'italic', color: '#1A2B47' }}>
+        <span style={{ display: 'block', fontFamily: 'var(--font-playfair)', fontSize: 'clamp(34px, 9vw, 80px)', fontWeight: 700, fontStyle: 'italic', color: '#F5F3EF' }}>
           Twoja firma.
         </span>
-        <span style={{ display: 'block', fontFamily: 'var(--font-playfair)', fontSize: 'clamp(52px, 7vw, 80px)', fontWeight: 700, fontStyle: 'italic', color: '#C9A84C' }}>
+        <span style={{ display: 'block', fontFamily: 'var(--font-playfair)', fontSize: 'clamp(34px, 9vw, 80px)', fontWeight: 700, fontStyle: 'italic', color: '#C9A84C' }}>
           Zautomatyzowana.
         </span>
       </motion.h1>
@@ -169,10 +137,10 @@ function HeroTitle() {
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35, duration: 0.65 }}
-        style={{ fontFamily: 'var(--font-dm)', fontSize: '18px', color: '#3D4F6B', maxWidth: 520, lineHeight: 1.8, marginBottom: '2rem', textAlign: 'center' }}
+        style={{ fontFamily: 'var(--font-dm)', fontSize: '18px', color: '#8A9AB5', maxWidth: 520, lineHeight: 1.8, marginBottom: '2rem', textAlign: 'center' }}
       >
         Wdrażamy systemy AI które działają.{' '}
-        <span style={{ color: '#1A2B47', fontWeight: 500 }}>Nie prezentacje — produkcja.</span>
+        <span style={{ color: '#F5F3EF', fontWeight: 500 }}>Nie prezentacje — produkcja.</span>
       </motion.p>
 
       <motion.div
@@ -184,18 +152,18 @@ function HeroTitle() {
         <a
           href="#kontakt"
           className="inline-flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 cursor-pointer"
-          style={{ fontFamily: 'var(--font-dm)', backgroundColor: '#1A2B47', color: '#F5F3EF', padding: '14px 32px', borderRadius: '4px' }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#C9A84C'; e.currentTarget.style.color = '#1A2B47' }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#1A2B47'; e.currentTarget.style.color = '#F5F3EF' }}
+          style={{ fontFamily: 'var(--font-dm)', backgroundColor: '#C9A84C', color: '#1A2B47', padding: '14px 32px', borderRadius: '4px' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F5F3EF' }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#C9A84C' }}
         >
           Umów bezpłatną analizę →
         </a>
         <a
           href="#realizacje"
           className="inline-flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 cursor-pointer"
-          style={{ fontFamily: 'var(--font-dm)', border: '1.5px solid #1A2B47', color: '#1A2B47', backgroundColor: 'transparent', padding: '14px 32px', borderRadius: '4px' }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(26,43,71,0.06)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
+          style={{ fontFamily: 'var(--font-dm)', border: '1.5px solid rgba(245,243,239,0.35)', color: '#F5F3EF', backgroundColor: 'transparent', padding: '14px 32px', borderRadius: '4px' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(245,243,239,0.08)'; e.currentTarget.style.borderColor = 'rgba(245,243,239,0.6)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'rgba(245,243,239,0.35)' }}
         >
           Zobacz wdrożenia ↓
         </a>
@@ -225,13 +193,11 @@ export default function Hero() {
     <section
       id="hero"
       className="relative overflow-hidden"
-      style={{ backgroundColor: '#F5F3EF' }}
+      style={{ backgroundColor: '#1A2B47' }}
       aria-label="Hero"
     >
-      {/* Floating paper cards */}
-      <div className="absolute inset-0 hidden lg:block pointer-events-none" style={{ zIndex: 2 }}>
-        <FloatingCards />
-      </div>
+      {/* Animated grid-pulse background */}
+      <GridPulseBackground className="pointer-events-none" />
 
       {/* Seal */}
       <div className="absolute hidden lg:block" style={{ top: '5rem', right: '4rem', zIndex: 10 }} aria-hidden>
@@ -254,12 +220,12 @@ export default function Hero() {
         >
           <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '9px', color: '#8A9AB5', letterSpacing: '0.2em' }}>SCROLL</span>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ opacity: 0.5 }}>
-            <path d="M6 2v8M3 7l3 3 3-3" stroke="#1A2B47" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6 2v8M3 7l3 3 3-3" stroke="#F5F3EF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </motion.div>
       </motion.div>
 
-      <div className="max-w-5xl mx-auto px-6 pt-40 pb-24">
+      <div className="relative max-w-5xl mx-auto px-6 pt-40 pb-24" style={{ zIndex: 10 }}>
         <HeroTitle />
       </div>
     </section>

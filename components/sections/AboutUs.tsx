@@ -12,10 +12,10 @@ const TEAM = [
     role: 'Architekt Automatyzacji · Założyciel',
     bio: 'Buduję systemy AI które zastępują powtarzalną pracę. Stack: Node.js, Make.com, n8n, Claude AI, PostgreSQL. Każde wdrożenie traktuję jak projekt inżynierski — najpierw architektura, potem kod.',
     badges: ['Node.js', 'Make.com', 'n8n', 'Claude AI', 'PostgreSQL', 'Railway'],
-    accentBg:    '#D4E4C8',
-    accentBgRgb: '212,228,200',
-    accentDark:  '#4A7A3A',
-    darkRgb:     '74,122,58',
+    accentBg:    '#F3EAD4',
+    accentBgRgb: '243,234,212',
+    accentDark:  '#1A2B47',
+    darkRgb:     '26,43,71',
   },
 ]
 
@@ -26,10 +26,10 @@ const MANIFESTO = [
 ]
 
 const COLLAGE = [
-  { bg: '#D4E4C8', w: 180, h: 240, rot: -6,  style: { left: '-30px', top: '40px'    } as React.CSSProperties },
-  { bg: '#F2D4C8', w: 140, h: 190, rot: 8,   style: { right: '-20px', top: '60px'   } as React.CSSProperties },
-  { bg: '#C8D4E8', w: 120, h: 160, rot: -4,  style: { left: '30px',  bottom: '20px' } as React.CSSProperties },
-  { bg: '#D4C8E8', w: 100, h: 130, rot: 12,  style: { right: '10px', bottom: '30px' } as React.CSSProperties },
+  { bg: '#C9A84C', w: 180, h: 240, rot: -6,  style: { left: '-30px', top: '40px'    } as React.CSSProperties },
+  { bg: '#EEEAE3', w: 140, h: 190, rot: 8,   style: { right: '-20px', top: '60px'   } as React.CSSProperties },
+  { bg: '#D7DEE8', w: 120, h: 160, rot: -4,  style: { left: '30px',  bottom: '20px' } as React.CSSProperties },
+  { bg: '#EADFC0', w: 100, h: 130, rot: 12,  style: { right: '10px', bottom: '30px' } as React.CSSProperties },
 ]
 
 /* ── Team card — dissolving edges on hover, no fold ───────────── */
