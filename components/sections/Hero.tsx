@@ -1,7 +1,40 @@
 'use client'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ContainerScroll } from '@/components/ui/container-scroll-animation'
 import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
+import { ParticleTextEffect } from '@/components/ui/particle-text-effect'
+
+/* ── Rotating kicker ────────────────────────────────────────────── */
+const KICKER_WORDS = ['PRZYSZŁOŚĆ', 'ROZWÓJ', 'BIZNES']
+
+function RotatingKicker() {
+  const [i, setI] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setI((v) => (v + 1) % KICKER_WORDS.length), 2200)
+    return () => clearInterval(id)
+  }, [])
+  return (
+    <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', color: '#8A9AB5', letterSpacing: '0.3em' }}>
+      [ DOLAR SYSTEMS _{' '}
+      <span style={{ position: 'relative', display: 'inline-block', minWidth: '9ch', textAlign: 'left' }}>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={KICKER_WORDS[i]}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            style={{ display: 'inline-block', color: '#C9A84C' }}
+          >
+            {KICKER_WORDS[i]}
+          </motion.span>
+        </AnimatePresence>
+      </span>{' '}
+      ]
+    </span>
+  )
+}
 
 /* ── Rotating Seal ──────────────────────────────────────────────── */
 function Seal() {
@@ -116,9 +149,7 @@ function HeroTitle() {
         transition={{ delay: 0.1, duration: 0.6 }}
         className="mb-7"
       >
-        <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', color: '#8A9AB5', letterSpacing: '0.3em' }}>
-          [ DOLAR SYSTEMS // AI AUTOMATYZACJA ]
-        </span>
+        <RotatingKicker />
       </motion.div>
 
       <motion.h1
@@ -231,9 +262,12 @@ export default function Hero() {
       </motion.div>
 
       <ContainerScroll titleComponent={<HeroTitle />}>
-        <video autoPlay loop muted playsInline className="w-full h-full object-cover" style={{ borderRadius: '18px' }}>
-          <source src="/videos/heroorigami.mp4" type="video/mp4" />
-        </video>
+        <div className="w-full h-full" style={{ borderRadius: '18px', overflow: 'hidden' }}>
+          <ParticleTextEffect
+            words={['DOLAR SYSTEMS', 'PRZYSZŁOŚĆ', 'ROZWÓJ', 'TWOJEJ FIRMY']}
+            holdFrames={110}
+          />
+        </div>
       </ContainerScroll>
     </section>
   )

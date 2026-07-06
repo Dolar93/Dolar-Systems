@@ -1,70 +1,54 @@
 'use client'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Scale, Stethoscope, Building2, Landmark, Factory, ArrowRight } from 'lucide-react'
+import { Globe, ShoppingBag, Clapperboard, Workflow, ArrowRight } from 'lucide-react'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { Reveal } from '@/components/animations/reveal'
 import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
 
 /* ── Brand config ──────────────────────────────────────────────── */
 const BRAND = {
-  kancelarie:    { bgRgb: '212,228,200', dark: '#4A7A3A', darkRgb: '74,122,58'  },
-  kliniki:       { bgRgb: '242,212,200', dark: '#8B4A35', darkRgb: '139,74,53'  },
-  nieruchomosci: { bgRgb: '200,212,232', dark: '#2A4A6B', darkRgb: '42,74,107'  },
-  deweloperzy:   { bgRgb: '232,220,200', dark: '#6B4A1A', darkRgb: '107,74,26'  },
-  produkcja:     { bgRgb: '212,200,232', dark: '#4A2A6B', darkRgb: '74,42,107'  },
+  strony:        { bgRgb: '212,228,200', dark: '#4A7A3A', darkRgb: '74,122,58'  },
+  sklepy:        { bgRgb: '242,212,200', dark: '#8B4A35', darkRgb: '139,74,53'  },
+  ugc:           { bgRgb: '212,200,232', dark: '#4A2A6B', darkRgb: '74,42,107'  },
+  automatyzacje: { bgRgb: '200,212,232', dark: '#2A4A6B', darkRgb: '42,74,107'  },
 }
 
-const INDUSTRIES = [
+const SERVICES = [
   {
-    id: 'kancelarie'    as const,
-    slug: '/branzy/kancelarie-prawne',
-    num: '01', Icon: Scale,
-    name: 'Kancelarie Prawne',
-    tasks: ['Auto-generowanie umów z szablonów', 'Chatbot intake klientów 24/7', 'System follow-up i przypomnień', 'Automatyczne faktury i dokumenty'],
-    stack: ['n8n', 'Claude AI', 'DocuSign'],
-    gridClass: 'col-span-1 md:col-span-2 lg:col-span-3 lg:row-span-2',
+    id: 'strony'        as const,
+    num: '01', Icon: Globe,
+    name: 'Strony Internetowe',
+    tasks: ['Premium design, wdrożenie w 24-48h', 'Next.js — szybkość i SEO od pierwszego dnia', 'Bez szablonów sprzed dekady', 'Panel do samodzielnej edycji treści'],
+    stack: ['Next.js', 'Framer Motion', 'Vercel'],
+    gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: true,
+    portfolio: { name: 'Moniquu Art', url: 'https://www.moniquuart.pl/' },
   },
   {
-    id: 'kliniki'       as const,
-    slug: '/branzy/kliniki-stomatologia',
-    num: '02', Icon: Stethoscope,
-    name: 'Kliniki / Stomatologia',
-    tasks: ['Chatbot umawiający wizyty', 'SMS/email — −60% no-show', 'Automatyczny wywiad medyczny', 'Raporty NFZ i dokumentacja'],
-    stack: ['Make.com', 'Twilio', 'CRM'],
+    id: 'sklepy'        as const,
+    num: '02', Icon: ShoppingBag,
+    name: 'Sklepy Internetowe',
+    tasks: ['E-commerce od zera lub migracja', 'Wdrożenie sprzedaży na TikTok Shop', 'Płatności, magazyn, wysyłka — spięte', 'Integracja z Allegro/OLX'],
+    stack: ['Next.js', 'TikTok Shop', 'Stripe'],
     gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
   },
   {
-    id: 'nieruchomosci' as const,
-    slug: '/branzy/agencje-nieruchomosci',
-    num: '03', Icon: Building2,
-    name: 'Agencje Nieruchomości',
-    tasks: ['Auto-odpowiedzi na OLX/Otodom', 'Kwalifikacja leadów przez AI', 'Generowanie opisów', 'CRM pipeline automatyczny'],
-    stack: ['Make.com', 'GPT-4', 'CRM'],
-    gridClass: 'col-span-1 md:col-span-1 lg:col-span-2',
+    id: 'ugc'           as const,
+    num: '03', Icon: Clapperboard,
+    name: 'Reklamy AI (UGC Models)',
+    tasks: ['Masz produkt i nie wiesz jak go zareklamować?', 'AI-modelki nagrywają reklamy zamiast ekipy zdjęciowej', 'Gotowe wideo pod TikTok/IG/FB w kilka dni', 'Bez castingu, studia i logistyki zdjęciowej'],
+    stack: ['Higgsfield', 'Buffer'],
+    gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
   },
   {
-    id: 'deweloperzy'   as const,
-    slug: '/branzy/deweloperzy',
-    num: '04', Icon: Landmark,
-    name: 'Deweloperzy',
-    tasks: ['Raporty sprzedaży auto-generowane', 'Dashboard KPI real-time', 'Auto-follow-up kupujących', 'Integracja z ERP'],
-    stack: ['n8n', 'PostgreSQL', 'Claude AI'],
-    gridClass: 'col-span-1 md:col-span-1 lg:col-span-2',
-    large: false,
-  },
-  {
-    id: 'produkcja'     as const,
-    slug: '/branzy/firmy-produkcyjne',
-    num: '05', Icon: Factory,
-    name: 'Firmy Produkcyjne',
-    tasks: ['Zamówienia przy niskim stanie', 'Raporty produkcyjne codzienne', 'System zgłoszeń i eskalacji', 'Integracja z ERP/WMS'],
-    stack: ['n8n', 'Make.com', 'ERP API'],
-    gridClass: 'col-span-1 md:col-span-2 lg:col-span-2',
+    id: 'automatyzacje' as const,
+    num: '04', Icon: Workflow,
+    name: 'Automatyzacje jako usługa',
+    tasks: ['Koniec z ręcznym Excelem i copy-paste', 'Systemy klienta połączone ze sobą', 'AI recepcjonista/chatbot 24/7', 'Integracje CRM, ERP, e-mail w jednym'],
+    stack: ['n8n', 'Make.com', 'Claude AI'],
+    gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
   },
 ] as const
@@ -113,17 +97,63 @@ function OrigamiBird({ color, size = 32, rotate = 0, opacity = 0.28 }: {
   )
 }
 
-/* ── Industry card ─────────────────────────────────────────────── */
-function Card({ item }: { item: (typeof INDUSTRIES)[number] }) {
+/* ── Live portfolio preview ────────────────────────────────────── */
+function PortfolioPreview({ name, url, darkRgb }: { name: string; url: string; darkRgb: string }) {
+  const host = url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+      className="block group"
+      style={{
+        borderRadius: '6px',
+        overflow: 'hidden',
+        border: `1px solid rgba(${darkRgb},0.22)`,
+        backgroundColor: 'rgba(255,255,255,0.55)',
+      }}
+    >
+      {/* Fake browser chrome bar */}
+      <div className="flex items-center gap-1.5 px-2.5 py-1.5" style={{ borderBottom: `1px solid rgba(${darkRgb},0.15)` }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${darkRgb},0.35)` }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${darkRgb},0.25)` }} />
+        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${darkRgb},0.15)` }} />
+        <span className="ml-1.5 truncate" style={{ fontFamily: 'var(--font-ibm)', fontSize: '9px', color: `rgba(${darkRgb},0.65)` }}>
+          {host}
+        </span>
+      </div>
+      {/* Live embedded preview of the real project */}
+      <div className="relative w-full overflow-hidden" style={{ height: 110, backgroundColor: '#fff' }}>
+        <iframe
+          src={url}
+          title={`Podgląd projektu: ${name}`}
+          loading="lazy"
+          className="absolute pointer-events-none"
+          style={{ width: '250%', height: '250%', transform: 'scale(0.4)', transformOrigin: 'top left', border: 0 }}
+        />
+        <div
+          className="absolute inset-0 flex items-end justify-between px-2.5 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent 60%)' }}
+        >
+          <span style={{ fontFamily: 'var(--font-dm)', fontSize: '11px', color: '#fff' }}>{name}</span>
+          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#fff' }}>Zobacz na żywo ↗</span>
+        </div>
+      </div>
+    </a>
+  )
+}
+
+/* ── Service card ──────────────────────────────────────────────── */
+function Card({ item }: { item: (typeof SERVICES)[number] }) {
   const { hovered, ref: cardRef, handlers } = useCardFold()
-  const router = useRouter()
   const b = BRAND[item.id]
   const { Icon } = item
   const foldSz = item.large ? 56 : 46
 
   return (
     <div className={item.gridClass} style={{ perspective: '700px' }}
-      onClick={() => router.push(item.slug)}
+      onClick={() => { window.location.hash = 'kontakt' }}
     >
       <motion.div
         ref={cardRef}
@@ -188,6 +218,11 @@ function Card({ item }: { item: (typeof INDUSTRIES)[number] }) {
           ))}
         </div>
 
+        {/* Real portfolio project, if any */}
+        {item.portfolio && (
+          <PortfolioPreview name={item.portfolio.name} url={item.portfolio.url} darkRgb={b.darkRgb} />
+        )}
+
         {/* Stack badges */}
         <div className="flex flex-wrap gap-1.5 pt-1">
           {item.stack.map((tech) => (
@@ -206,8 +241,8 @@ function Card({ item }: { item: (typeof INDUSTRIES)[number] }) {
         </div>
 
         {/* CTA link */}
-        <Link
-          href={item.slug}
+        <a
+          href="#kontakt"
           className="inline-flex items-center gap-1.5 mt-1 transition-opacity duration-200"
           style={{
             fontFamily: 'var(--font-ibm)',
@@ -218,9 +253,9 @@ function Card({ item }: { item: (typeof INDUSTRIES)[number] }) {
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          Zobacz ofertę
+          Zapytaj o ofertę
           <ArrowRight size={11} />
-        </Link>
+        </a>
       </motion.div>
     </div>
   )
@@ -263,15 +298,15 @@ export default function WhatWeAutomate() {
 
       <div className="relative max-w-7xl mx-auto px-6" style={{ zIndex: 1 }}>
         <Reveal className="mb-12">
-          <SectionLabel number="02" label="ZAKRES WDROŻEŃ" />
+          <SectionLabel number="02" label="ZAKRES USŁUG" />
           <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(34px, 5vw, 46px)', fontWeight: 700, color: '#1A2B47', maxWidth: 520 }}>
-            Konkretne systemy.{' '}
-            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Konkretne branże.</span>
+            Cztery usługi.{' '}
+            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Jeden cel — czas.</span>
           </h2>
         </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 auto-rows-auto">
-          {INDUSTRIES.map((item) => (
+          {SERVICES.map((item) => (
             <Card key={item.id} item={item} />
           ))}
         </div>
