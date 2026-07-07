@@ -35,6 +35,7 @@ const SERVICES = [
     points: ['Płatności, magazyn i wysyłka działają same', 'Wchodzimy z Tobą na TikTok Shop', 'Mniej klikania po zapleczu, więcej zamówień'],
     gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
+    portfolio: undefined,
   },
   {
     id: 'ugc'           as const,
@@ -44,6 +45,7 @@ const SERVICES = [
     points: ['Nagrywamy reklamy bez ekipy i modelek', 'Gotowe wideo pod TikTok/IG/FB w kilka dni', 'Ty zajmujesz się produktem, my kreacją'],
     gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
+    portfolio: undefined,
   },
   {
     id: 'automatyzacje' as const,
@@ -53,6 +55,7 @@ const SERVICES = [
     points: ['Łączymy systemy, które dotąd ze sobą nie gadały', 'Zapytania klientów obsłużone, nawet gdy śpisz', 'Odzyskujesz czas — a nie dokładamy Ci pracy'],
     gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
     large: false,
+    portfolio: undefined,
   },
 ] as const
 
