@@ -168,7 +168,7 @@ export default function CaseStudies() {
   return (
     <section id="realizacje" className="py-28" style={{ backgroundColor: '#EEEAE3' }}>
       <div className="max-w-7xl mx-auto px-6">
-        <Reveal className="mb-3"><SectionLabel number="04" label="REALIZACJE" /></Reveal>
+        <Reveal className="mb-3"><SectionLabel number="03" label="REALIZACJE" /></Reveal>
         <Reveal delay={0.05} className="mb-2">
           <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(36px, 5vw, 48px)', fontWeight: 700, color: '#1A2B47' }}>
             Wdrożenia które działają{' '}<span style={{ fontStyle: 'italic', color: '#C9A84C' }}>w produkcji.</span>

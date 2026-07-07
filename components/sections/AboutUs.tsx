@@ -108,7 +108,7 @@ export default function AboutUs() {
     <section id="zespol" className="py-28" style={{ backgroundColor: '#F5F3EF' }}>
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="mb-14">
-          <SectionLabel number="05" label="ZAŁOŻYCIEL" />
+          <SectionLabel number="04" label="ZAŁOŻYCIEL" />
           <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(36px, 5vw, 48px)', fontWeight: 700, color: '#1A2B47', maxWidth: 600 }}>
             Nie sprzedajemy narzędzi.{' '}
             <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Wdrażamy systemy które działają.</span>

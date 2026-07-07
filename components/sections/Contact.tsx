@@ -98,7 +98,7 @@ export default function Contact() {
     <section id="kontakt" className="py-28" style={{ backgroundColor: '#EEEAE3' }}>
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="mb-14">
-          <SectionLabel number="06" label="KONTAKT" />
+          <SectionLabel number="05" label="KONTAKT" />
           <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(36px, 5vw, 48px)', fontWeight: 700, fontStyle: 'italic', color: '#1A2B47', marginBottom: '1rem' }}>
             Powiedz nam o swojej firmie.
           </h2>
