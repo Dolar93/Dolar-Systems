@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Trail } from '@react-three/drei'
 import * as THREE from 'three'
 
 const NODE_COUNT = 240
@@ -202,6 +202,114 @@ function NeuralBrain({ sprite, started }: { sprite: THREE.Texture; started: bool
   )
 }
 
+/* ── Money meteor shower — glowing $ comets streaking past ───────── */
+function MoneyMeteor({ delay }: { delay: number }) {
+  const ref = useRef<THREE.Mesh>(null)
+  const state = useRef({ pos: new THREE.Vector3(), vel: new THREE.Vector3(), life: -delay })
+
+  useFrame((_, delta) => {
+    const s = state.current
+    if (s.life <= 0) {
+      s.pos.set(4.5 + Math.random() * 2.5, 3.2 + Math.random() * 1.6, -2.5 + Math.random() * 5)
+      s.vel.set(-1, -0.55, -0.1).normalize().multiplyScalar(3 + Math.random() * 1.6)
+      s.life = 2.2 + Math.random() * 1.4
+    }
+    s.pos.addScaledVector(s.vel, delta)
+    s.life -= delta
+    if (ref.current) ref.current.position.copy(s.pos)
+  })
+
+  return (
+    <Trail width={2.2} length={6} color="#7CDB8A" attenuation={(t) => t * t} decay={1.5}>
+      <mesh ref={ref}>
+        <sphereGeometry args={[0.05, 8, 8]} />
+        <meshBasicMaterial color="#D8FFC8" />
+      </mesh>
+    </Trail>
+  )
+}
+
+function MoneyMeteorShower() {
+  return (
+    <>
+      {[0, 0.6, 1.3, 2.1, 2.8].map((d, i) => (
+        <MoneyMeteor key={i} delay={d} />
+      ))}
+    </>
+  )
+}
+
+/* ── Galactic-war laser crossfire — quick flashes, two "sides" ────── */
+function LaserBolt({ index }: { index: number }) {
+  const matRef = useRef<THREE.LineBasicMaterial>(null)
+  const geomRef = useRef<THREE.BufferGeometry>(null)
+  const state = useRef({ life: -1, cooldown: 0.6 + Math.random() * 2.4 })
+
+  useFrame((_, delta) => {
+    const s = state.current
+    if (s.life < 0) {
+      s.cooldown -= delta
+      if (matRef.current) matRef.current.opacity = 0
+      if (s.cooldown <= 0 && geomRef.current) {
+        const angle = Math.random() * Math.PI * 2
+        const r = 3.4 + Math.random() * 1.6
+        const ax = Math.cos(angle) * r, az = Math.sin(angle) * r
+        const ay = (Math.random() - 0.5) * 2.2 + 0.3
+        const bx = -ax + (Math.random() - 0.5) * 1.5
+        const bz = -az + (Math.random() - 0.5) * 1.5
+        const by = (Math.random() - 0.5) * 2.2 + 0.3
+        geomRef.current.setAttribute('position', new THREE.Float32BufferAttribute([ax, ay, az, bx, by, bz], 3))
+        s.life = 0.3
+        s.cooldown = 1.2 + Math.random() * 2.6
+      }
+      return
+    }
+    s.life -= delta
+    if (matRef.current) matRef.current.opacity = Math.max(s.life / 0.3, 0) * 0.85
+    if (s.life <= 0) s.life = -1
+  })
+
+  return (
+    <line>
+      <bufferGeometry ref={geomRef}>
+        <bufferAttribute attach="attributes-position" args={[new Float32Array(6), 3]} />
+      </bufferGeometry>
+      <lineBasicMaterial
+        ref={matRef}
+        color={index % 2 === 0 ? '#E4574C' : '#C9A84C'}
+        transparent
+        opacity={0}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </line>
+  )
+}
+
+function LaserCrossfire() {
+  return (
+    <>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <LaserBolt key={i} index={i} />
+      ))}
+    </>
+  )
+}
+
+/* ── Slow orbit ring — a quiet nod to "working around the clock" ─── */
+function TimeRing() {
+  const ref = useRef<THREE.Mesh>(null)
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.z += delta * 0.12
+  })
+  return (
+    <mesh ref={ref} rotation={[Math.PI / 2.4, 0.3, 0]}>
+      <torusGeometry args={[2.7, 0.006, 8, 128]} />
+      <meshBasicMaterial color="#C9A84C" transparent opacity={0.22} />
+    </mesh>
+  )
+}
+
 function Scene({ started }: { started: boolean }) {
   const sprite = useStarSprite()
   return (
@@ -212,6 +320,9 @@ function Scene({ started }: { started: boolean }) {
 
       <Starfield sprite={sprite} />
       <NeuralBrain sprite={sprite} started={started} />
+      <TimeRing />
+      <MoneyMeteorShower />
+      <LaserCrossfire />
 
       <OrbitControls
         enableZoom={false}
