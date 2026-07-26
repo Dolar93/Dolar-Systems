@@ -76,11 +76,11 @@ export default function AboutUs() {
 
         <div className="flex justify-center">
           <div className="relative w-full max-w-2xl">
-            {/* Bluszcz wspina się po rogu zdjęcia — jedyne miejsce na
-                płycie, gdzie liście nie wchodzą na tekst */}
-            <div className="absolute pointer-events-none origin-bottom-left scale-[0.5] sm:scale-75 lg:scale-90"
-              style={{ bottom: -34, left: -40, zIndex: 3 }}>
-              <Vine size={190} flipY delay={0.2} />
+            {/* Pojedynczy pęd opada wzdłuż krawędzi zdjęcia — jedyne
+                miejsce na płycie, gdzie liście nie wchodzą na tekst */}
+            <div className="absolute pointer-events-none hidden sm:block"
+              style={{ top: -28, left: -46, zIndex: 3 }}>
+              <Vine variant="hanging" size={92} delay={0.2} />
             </div>
             {TEAM.map((member) => (
               <Reveal key={member.name}><TeamCard member={member} /></Reveal>
