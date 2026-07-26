@@ -1,256 +1,259 @@
 'use client'
 import { motion } from 'framer-motion'
-import { Globe, ShoppingBag, Clapperboard, Workflow, ArrowRight, Check } from 'lucide-react'
+import { ClipboardCheck, CalendarCheck, Workflow, ArrowRight, Check } from 'lucide-react'
 import SectionLabel from '@/components/ui/SectionLabel'
+import StonePlate from '@/components/ui/StonePlate'
 import { Reveal } from '@/components/animations/reveal'
-import { FoldCorner, useCardFold } from '@/components/ui/FoldCorner'
+import { STONE, FONT, CARVED, grout } from '@/components/ui/stone'
 
-/* ── Curated accent palette — one deliberate colour per card, ──────
-   all tuned to sit next to the navy/gold base without turning
-   into a pastel post-it wall. */
+/* ── Akcenty w obrębie jednego materiału ───────────────────────────
+   Mech dla flagowca, woda dla rezerwacji, łupek dla automatyzacji.
+   Wersje `check` są przyciemnione tak, żeby ptaszki same z siebie
+   trzymały 3:1 na jasnym kamieniu. */
 const ACCENTS = {
-  strony:        { c: '#C9A84C', rgb: '201,168,76'  }, // gold — flagship
-  sklepy:        { c: '#C1652F', rgb: '193,101,47'  }, // terracotta
-  ugc:           { c: '#1F7A6C', rgb: '31,122,108'  }, // teal
-  automatyzacje: { c: '#5B4B8A', rgb: '91,75,138'   }, // indigo
+  rentcore:      { c: STONE.moss,      check: '#41581F' },
+  bookcore:      { c: '#4E6577',       check: '#3E5364' },
+  automatyzacje: { c: STONE.slateSoft, check: '#3A404C' },
 }
-const NAVY = '26,43,71'
 
+/* Etykieta niesie realny stan oferty, nie dekoracyjny numer 01/02/03 */
 const SERVICES = [
   {
-    id: 'strony'        as const,
-    num: '01', Icon: Globe,
-    name: 'Strony Internetowe',
-    hook: 'Twoja strona ma więcej lat niż Twój najmłodszy pracownik?',
-    points: ['Nowa strona w 24–48h, bez czekania tygodniami', 'Ładuje się szybko i dobrze wygląda na telefonie', 'Sam zmienisz tekst czy zdjęcie, bez dzwonienia do nas'],
-    gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
-    large: true,
-    portfolio: { name: 'Moniquu Art', url: 'https://www.moniquuart.pl/' },
+    id: 'rentcore' as const,
+    status: 'WDROŻENIE W TOKU',
+    Icon: ClipboardCheck,
+    product: 'RentCore',
+    name: 'System dla wypożyczalni sprzętu',
+    hook: 'Klient mówi, że rysa już tam była. Nie masz jak udowodnić, że nie.',
+    points: [
+      'Protokół wydania i zwrotu ze zdjęciami i podpisem — koniec sporów bez dowodu',
+      'Podgląd całej sieci oddziałów z jednego miejsca',
+      'Decyzje na danych: który sprzęt się zwraca, który oddział przoduje',
+    ],
+    variant: 'flagship' as const,
+    gridClass: 'col-span-1 lg:col-span-12',
   },
   {
-    id: 'sklepy'        as const,
-    num: '02', Icon: ShoppingBag,
-    name: 'Sklepy Internetowe',
-    hook: 'Chcesz sprzedawać, nie ogarniać oprogramowanie?',
-    points: ['Płatności, magazyn i wysyłka działają same', 'Wchodzimy z Tobą na TikTok Shop', 'Mniej klikania po zapleczu, więcej zamówień'],
-    gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
-    large: false,
-    portfolio: undefined,
-  },
-  {
-    id: 'ugc'           as const,
-    num: '03', Icon: Clapperboard,
-    name: 'Reklamy AI (UGC Models)',
-    hook: 'Masz produkt i nie wiesz jak go pokazać?',
-    points: ['Nagrywamy reklamy bez ekipy i modelek', 'Gotowe wideo pod TikTok/IG/FB w kilka dni', 'Ty zajmujesz się produktem, my kreacją'],
-    gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
-    large: false,
-    portfolio: undefined,
+    id: 'bookcore' as const,
+    status: 'PRODUKT WŁASNY',
+    Icon: CalendarCheck,
+    product: 'BookCore',
+    name: 'Rezerwacje dla usług premium',
+    hook: 'Recepcja cały wieczór odpisuje na „a może we wtorek o 15", zamiast obsługiwać klientów na miejscu.',
+    points: [
+      'Klient umawia wizytę w naturalnej rozmowie z agentem AI — bez apki, bez telefonu',
+      'Kalendarz wypełnia się sam, zero podwójnych rezerwacji',
+      'Dopasowane do klinik i salonów premium — dyskretnie, bez kompromisów na jakości',
+    ],
+    variant: 'standard' as const,
+    gridClass: 'col-span-1 lg:col-span-6',
   },
   {
     id: 'automatyzacje' as const,
-    num: '04', Icon: Workflow,
-    name: 'Automatyzacje jako usługa',
-    hook: 'Ile godzin tygodniowo zjada Ci Excel i kopiuj-wklej?',
-    points: ['Łączymy systemy, które dotąd ze sobą nie gadały', 'Zapytania klientów obsłużone, nawet gdy śpisz', 'Odzyskujesz czas — a nie dokładamy Ci pracy'],
-    gridClass: 'col-span-1 md:col-span-2 lg:col-span-3',
-    large: false,
-    portfolio: undefined,
+    status: 'NA ZAMÓWIENIE',
+    Icon: Workflow,
+    product: '',
+    name: 'Automatyzacje procesów',
+    hook: 'Ile godzin tygodniowo zjada Wam Excel, kopiuj-wklej i ręczne raportowanie?',
+    points: [
+      'Łączymy systemy, które dotąd ze sobą nie gadały',
+      'Przejmujemy powtarzalne zadania — dokumenty, komunikację, raporty',
+      'Zespół wraca do pracy, która faktycznie się liczy',
+    ],
+    variant: 'standard' as const,
+    gridClass: 'col-span-1 lg:col-span-6',
   },
 ] as const
 
-/* ── Live portfolio preview ────────────────────────────────────── */
-function PortfolioPreview({ name, url, accentRgb }: { name: string; url: string; accentRgb: string }) {
-  const host = url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+type Service = (typeof SERVICES)[number]
+
+/* ── Lista dowodów ─────────────────────────────────────────────── */
+function Points({ points, accent, size }: { points: readonly string[]; accent: string; size: number }) {
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
-      className="block group"
-      style={{
-        borderRadius: '6px',
-        overflow: 'hidden',
-        border: `1px solid rgba(${accentRgb},0.30)`,
-        backgroundColor: '#fff',
-      }}
-    >
-      {/* Fake browser chrome bar */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1.5" style={{ borderBottom: `1px solid rgba(${accentRgb},0.18)` }}>
-        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${accentRgb},0.45)` }} />
-        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${accentRgb},0.30)` }} />
-        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `rgba(${accentRgb},0.18)` }} />
-        <span className="ml-1.5 truncate" style={{ fontFamily: 'var(--font-ibm)', fontSize: '9px', color: `rgba(${NAVY},0.65)` }}>
-          {host}
-        </span>
-      </div>
-      {/* Live embedded preview of the real project */}
-      <div className="relative w-full overflow-hidden" style={{ height: 110, backgroundColor: '#fff' }}>
-        <iframe
-          src={url}
-          title={`Podgląd projektu: ${name}`}
-          loading="lazy"
-          className="absolute pointer-events-none"
-          style={{ width: '250%', height: '250%', transform: 'scale(0.4)', transformOrigin: 'top left', border: 0 }}
-        />
-        <div
-          className="absolute inset-0 flex items-end justify-between px-2.5 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent 60%)' }}
-        >
-          <span style={{ fontFamily: 'var(--font-dm)', fontSize: '11px', color: '#fff' }}>{name}</span>
-          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: '#fff' }}>Zobacz na żywo ↗</span>
-        </div>
-      </div>
-    </a>
-  )
-}
-
-/* ── Service card ──────────────────────────────────────────────── */
-function Card({ item }: { item: (typeof SERVICES)[number] }) {
-  const { hovered, ref: cardRef, handlers } = useCardFold()
-  const { Icon } = item
-  const accent = ACCENTS[item.id]
-  const foldSz = item.large ? 56 : 46
-
-  return (
-    <div className={item.gridClass} style={{ perspective: '700px' }}
-      onClick={() => { window.location.hash = 'kontakt' }}
-    >
-      <motion.div
-        ref={cardRef}
-        {...handlers}
-        className="h-full flex flex-col gap-4"
-        style={{
-          position: 'relative',
-          backgroundColor: '#FFFFFF',
-          backgroundImage: `radial-gradient(ellipse 420px 220px at 100% 0%, rgba(${accent.rgb},0.12), transparent 70%)`,
-          borderTop: `3px solid ${accent.c}`,
-          border: `1px solid rgba(${NAVY},0.08)`,
-          borderTopWidth: '3px',
-          borderTopColor: accent.c,
-          borderRadius: '10px',
-          padding: item.large ? '24px' : '20px',
-          overflow: 'visible',
-          transformOrigin: 'top center',
-          transformStyle: 'preserve-3d',
-          cursor: 'pointer',
-        }}
-        initial={{ rotateX: 6, opacity: 0, y: 20 }}
-        whileInView={{ rotateX: 6, opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.55, ease: 'easeOut' }}
-        animate={{
-          rotateX: hovered ? 1 : 6,
-          y:       hovered ? -6 : 0,
-          boxShadow: hovered
-            ? `0 20px 40px rgba(${accent.rgb},0.18), 0 4px 10px rgba(0,0,0,0.06)`
-            : '2px 2px 0 rgba(0,0,0,0.04), 4px 4px 0 rgba(0,0,0,0.03), 6px 6px 20px rgba(0,0,0,0.06)',
-        }}
-      >
-        {/* ── Origami corner fold (top-right) ── */}
-        <FoldCorner bgRgb="250,250,248" isOpen={hovered} sz={foldSz} />
-
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div
-            className="flex items-center justify-center rounded-full flex-shrink-0"
-            style={{ width: 48, height: 48, backgroundColor: `rgba(${accent.rgb},0.14)` }}
-          >
-            <Icon size={item.large ? 24 : 20} style={{ color: accent.c }} />
-          </div>
-          <span style={{ fontFamily: 'var(--font-ibm)', fontSize: '10px', color: accent.c, opacity: 0.85, letterSpacing: '0.1em' }}>
-            [{item.num}]
+    <div className="flex flex-col gap-2.5 flex-1">
+      {points.map((point) => (
+        <div key={point} className="flex items-start gap-2.5">
+          <Check size={16} style={{ color: accent, flexShrink: 0, marginTop: 3 }} aria-hidden />
+          <span style={{ fontFamily: FONT.body, fontSize: `${size}px`, color: STONE.inkSoft, lineHeight: 1.6 }}>
+            {point}
           </span>
         </div>
-
-        {/* Title */}
-        <h3 style={{
-          fontFamily: 'var(--font-playfair)',
-          fontSize: item.large ? '23px' : '18px',
-          fontWeight: 700,
-          color: '#1A2B47',
-          lineHeight: 1.2,
-        }}>
-          {item.name}
-        </h3>
-
-        {/* Hook — casual pain-point line, not a sales pitch */}
-        <p style={{
-          fontFamily: 'var(--font-dm)',
-          fontSize: '15px',
-          fontStyle: 'italic',
-          color: accent.c,
-          lineHeight: 1.5,
-          marginTop: '-8px',
-        }}>
-          {item.hook}
-        </p>
-
-        {/* Plain-language benefit list */}
-        <div className="flex flex-col gap-2 flex-1">
-          {item.points.map((point) => (
-            <div key={point} className="flex items-start gap-2">
-              <Check size={15} style={{ color: accent.c, flexShrink: 0, marginTop: 2 }} />
-              <span style={{ fontFamily: 'var(--font-dm)', fontSize: '13.5px', color: 'rgba(26,43,71,0.82)', lineHeight: 1.5 }}>
-                {point}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Real portfolio project, if any */}
-        {item.portfolio && (
-          <PortfolioPreview name={item.portfolio.name} url={item.portfolio.url} accentRgb={accent.rgb} />
-        )}
-
-        {/* CTA link */}
-        <a
-          href="#kontakt"
-          className="inline-flex items-center gap-1.5 mt-1 transition-opacity duration-200"
-          style={{
-            fontFamily: 'var(--font-ibm)',
-            fontSize: '11px',
-            fontWeight: 600,
-            color: accent.c,
-            opacity: hovered ? 1 : 0.75,
-            letterSpacing: '0.08em',
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          Zapytaj o ofertę
-          <ArrowRight size={11} />
-        </a>
-      </motion.div>
+      ))}
     </div>
   )
 }
 
-/* ── Section ─────────────────────────────────────────────────────── */
+/* ── CTA ───────────────────────────────────────────────────────── */
+function Cta({ accent, hovered, label }: { accent: string; hovered: boolean; label: string }) {
+  return (
+    <a
+      href="#kontakt"
+      className="inline-flex items-center gap-1.5 self-start transition-opacity duration-200"
+      style={{
+        fontFamily: FONT.mono,
+        fontSize: '11px',
+        fontWeight: 600,
+        color: accent,
+        opacity: hovered ? 1 : 0.8,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+      }}
+      aria-label={label}
+      onClick={(e) => e.stopPropagation()}
+    >
+      Zapytaj o wdrożenie
+      <ArrowRight size={11} aria-hidden />
+    </a>
+  )
+}
+
+/* ── Karta systemu ─────────────────────────────────────────────── */
+function Card({ item }: { item: Service }) {
+  const { Icon } = item
+  const accent = ACCENTS[item.id]
+  const flagship = item.variant === 'flagship'
+
+  /* Nagłówek trzyma się lewej — ikona, nazwa produktu, stan wdrożenia */
+  const header = (
+    <div className="flex items-center gap-3.5">
+      <div
+        className="flex items-center justify-center flex-shrink-0"
+        style={{
+          width: flagship ? 52 : 46,
+          height: flagship ? 52 : 46,
+          backgroundColor: `${accent.c}1F`,
+          border: `1px solid ${accent.c}44`,
+        }}
+      >
+        <Icon size={flagship ? 24 : 20} style={{ color: accent.c }} aria-hidden />
+      </div>
+      <div className="flex flex-col items-start gap-1.5 min-w-0">
+        {item.product && (
+          <span
+            className="carved"
+            style={{ ...CARVED, fontSize: flagship ? '21px' : '18px', color: STONE.ink, lineHeight: 1 }}
+          >
+            {item.product}
+          </span>
+        )}
+        <span
+          style={{
+            fontFamily: FONT.mono, fontSize: '9.5px', color: accent.c,
+            letterSpacing: '0.16em', border: `1px solid ${accent.c}55`,
+            padding: '3px 8px', whiteSpace: 'nowrap',
+          }}
+        >
+          {item.status}
+        </span>
+      </div>
+    </div>
+  )
+
+  const title = (
+    <h3
+      className="carved"
+      style={{ ...CARVED, fontSize: flagship ? '25px' : '19px', color: STONE.ink, lineHeight: 1.15 }}
+    >
+      {item.name}
+    </h3>
+  )
+
+  /* Ból klienta jego własnymi słowami */
+  const hook = (
+    <p style={{
+      fontFamily: FONT.body,
+      fontSize: flagship ? '16px' : '15px',
+      fontStyle: 'italic',
+      color: accent.c,
+      lineHeight: 1.6,
+      marginTop: '-4px',
+    }}>
+      {item.hook}
+    </p>
+  )
+
+  return (
+    <motion.div
+      className={item.gridClass}
+      initial={{ opacity: 0, y: 22 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.55, ease: 'easeOut' }}
+    >
+      <StonePlate
+        accent={accent.c}
+        tone="light"
+        style={{ padding: flagship ? '30px' : '24px' }}
+        onClick={() => { window.location.hash = 'kontakt' }}
+      >
+        {(hovered) =>
+          flagship ? (
+            /* Flagowiec jako baner: oferta po lewej, dowody po prawej,
+               rozdzielone włosową fugą. Na mobile CTA zostaje na końcu. */
+            <div className="flex flex-col">
+              <div className="flex flex-col lg:flex-row lg:items-stretch gap-7 lg:gap-10">
+                <div className="flex flex-col gap-4 lg:w-[44%]">
+                  {header}
+                  {title}
+                  {hook}
+                  <div className="hidden lg:flex lg:flex-col lg:flex-1 lg:justify-end">
+                    <Cta accent={accent.c} hovered={hovered} label="Zapytaj o wdrożenie systemu RentCore" />
+                  </div>
+                </div>
+                <div
+                  className="flex border-t lg:border-t-0 lg:border-l pt-6 lg:pt-1 lg:pl-10"
+                  style={{ borderColor: 'rgba(51,71,28,0.20)' }}
+                >
+                  <Points points={item.points} accent={accent.check} size={15} />
+                </div>
+              </div>
+              <div className="flex lg:hidden mt-6">
+                <Cta accent={accent.c} hovered={hovered} label="Zapytaj o wdrożenie systemu RentCore" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4 h-full">
+              {header}
+              {title}
+              {hook}
+              <Points points={item.points} accent={accent.check} size={14} />
+              <Cta accent={accent.c} hovered={hovered} label={`Zapytaj o wdrożenie: ${item.name}`} />
+            </div>
+          )
+        }
+      </StonePlate>
+    </motion.div>
+  )
+}
+
+/* ── Sekcja ──────────────────────────────────────────────────────── */
 export default function WhatWeAutomate() {
   return (
     <section
       id="zakres"
       className="relative py-28 overflow-hidden"
-      style={{
-        backgroundColor: '#F5F3EF',
-        backgroundImage: `
-          linear-gradient(rgba(26,43,71,0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(26,43,71,0.05) 1px, transparent 1px)
-        `,
-        backgroundSize: '48px 48px',
-      }}
+      style={{ backgroundColor: STONE.travertine, ...grout(84, 0.16) }}
     >
       <div className="relative max-w-7xl mx-auto px-6" style={{ zIndex: 1 }}>
-        <Reveal className="mb-12">
-          <SectionLabel number="02" label="ZAKRES USŁUG" />
-          <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(34px, 5vw, 46px)', fontWeight: 700, color: '#1A2B47', maxWidth: 520 }}>
-            Cztery usługi.{' '}
-            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Jeden cel — czas.</span>
+        <Reveal className="mb-3">
+          <SectionLabel number="02" label="CO BUDUJEMY" />
+          <h2
+            className="carved"
+            style={{ ...CARVED, fontSize: 'clamp(21px, 3.1vw, 32px)', color: STONE.ink, maxWidth: 840, lineHeight: 1.2 }}
+          >
+            Budujemy systemy pod jedną branżę{' '}
+            <span style={{ color: STONE.moss }}>i pokazujemy je, zanim zdecydujesz o wdrożeniu.</span>
           </h2>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5 auto-rows-auto">
+        <Reveal delay={0.08} className="mb-12">
+          <p style={{ fontFamily: FONT.body, fontSize: '16px', color: STONE.inkSoft, maxWidth: 640, lineHeight: 1.75, marginTop: 14 }}>
+            RentCore i BookCore to nasze własne produkty — działające systemy, które możemy Wam pokazać
+            na spotkaniu. Automatyzacje budujemy wokół procesu, który już u Was działa.
+          </p>
+        </Reveal>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           {SERVICES.map((item) => (
             <Card key={item.id} item={item} />
           ))}

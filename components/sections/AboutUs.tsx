@@ -1,8 +1,9 @@
 'use client'
-import { useState } from 'react'
-import { motion } from 'framer-motion'
 import SectionLabel from '@/components/ui/SectionLabel'
+import StonePlate from '@/components/ui/StonePlate'
+import Vine from '@/components/ui/Vine'
 import { Reveal } from '@/components/animations/reveal'
+import { STONE, FONT, CARVED, grout } from '@/components/ui/stone'
 
 const TEAM = [
   {
@@ -10,115 +11,79 @@ const TEAM = [
     name: 'Bartosz "Dolar" Dolczewski',
     role: 'Założyciel',
     bio: 'Buduję systemy, które przejmują powtarzalną pracę — żebyś Ty mógł zająć się prowadzeniem firmy, nie pilnowaniem tabelek.',
-    accentBg:    '#F3EAD4',
-    accentBgRgb: '243,234,212',
-    accentDark:  '#1A2B47',
-    darkRgb:     '26,43,71',
   },
 ]
 
-/* ── Team card — dissolving edges on hover, no fold ───────────── */
-function TeamCard({ member, index }: { member: typeof TEAM[number]; index: number }) {
-  const [hovered, setHovered] = useState(false)
-
+function TeamCard({ member }: { member: typeof TEAM[number] }) {
   return (
-    <Reveal delay={index * 0.15}>
-      <motion.div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onTouchStart={() => setHovered(true)}
-        onTouchEnd={() => setHovered(false)}
-        animate={{ y: hovered ? -8 : 0, scale: hovered ? 1.01 : 1 }}
-        transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-        style={{
-          borderRadius: '12px',
-          overflow: 'hidden',
-          /* Border fades to transparent, shadow dissolves to soft glow */
-          border: hovered
-            ? '1px solid transparent'
-            : '1px solid rgba(0,0,0,0.07)',
-          backgroundColor: hovered
-            ? `rgba(${member.accentBgRgb},0.38)`
-            : member.accentBg,
-          boxShadow: hovered
-            ? `0 28px 56px rgba(${member.darkRgb},0.16), 0 8px 20px rgba(${member.darkRgb},0.08)`
-            : '2px 2px 0px rgba(0,0,0,0.06), 4px 4px 0px rgba(0,0,0,0.04), 8px 8px 16px rgba(0,0,0,0.08)',
-          transition: 'border-color 0.45s ease, background-color 0.45s ease, box-shadow 0.45s ease',
-        }}
-      >
-        <div className="flex flex-col sm:flex-row">
-
-          {/* Photo */}
+    <StonePlate tone="light" accent={STONE.moss} style={{ overflow: 'hidden' }}>
+      <div className="flex flex-col sm:flex-row">
+        {/* Zdjęcie osadzone jak płyta w bruku */}
+        <div className="relative flex-shrink-0" style={{ width: '100%', maxWidth: 210, aspectRatio: '3/4' }}>
+          <img
+            src={member.photo}
+            alt={member.name}
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: 'center top', display: 'block',
+            }}
+          />
+          {/* Dół zdjęcia wtapia się w kamień płyty */}
           <div
-            className="relative flex-shrink-0"
-            style={{ width: '100%', maxWidth: 200, aspectRatio: '3/4' }}
-          >
-            <img
-              src={member.photo}
-              alt={member.name}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center top',
-                display: 'block',
-                /* Photo edges soften on hover matching card */
-                transition: 'opacity 0.45s ease',
-                opacity: hovered ? 0.92 : 1,
-              }}
-            />
-            {/* Bottom gradient blends photo into card colour */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 0, left: 0, right: 0,
-                height: '55%',
-                background: `linear-gradient(to bottom, transparent, ${member.accentBg}E0)`,
-                transition: 'background 0.45s ease',
-                pointerEvents: 'none',
-              }}
-            />
-          </div>
-
-          {/* Text content */}
-          <div className="flex flex-col p-6 flex-1">
-            <div className="mb-4">
-              <div style={{ fontFamily: 'var(--font-playfair)', fontSize: '22px', fontWeight: 700, color: member.accentDark, lineHeight: 1.2, marginBottom: 4 }}>
-                {member.name}
-              </div>
-              <div style={{ fontFamily: 'var(--font-ibm)', fontSize: '11px', color: member.accentDark, opacity: 0.65, letterSpacing: '0.08em' }}>
-                {member.role}
-              </div>
-            </div>
-
-            <p style={{ fontFamily: 'var(--font-dm)', fontSize: '14px', color: member.accentDark, lineHeight: 1.75, opacity: 0.88, flex: 1 }}>
-              {member.bio}
-            </p>
-          </div>
+            aria-hidden
+            style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
+              background: `linear-gradient(to bottom, transparent, ${STONE.light}F0)`,
+              pointerEvents: 'none',
+            }}
+          />
+          <div aria-hidden style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: 2, backgroundColor: 'rgba(51,71,28,0.22)' }} />
         </div>
-      </motion.div>
-    </Reveal>
+
+        <div className="flex flex-col p-7 flex-1">
+          <div className="mb-4">
+            <div className="carved" style={{ ...CARVED, fontSize: '20px', color: STONE.ink, lineHeight: 1.2, marginBottom: 8 }}>
+              {member.name}
+            </div>
+            <span style={{
+              fontFamily: FONT.mono, fontSize: '9.5px', color: STONE.moss,
+              letterSpacing: '0.16em', border: `1px solid ${STONE.moss}55`, padding: '3px 8px',
+            }}>
+              {member.role.toUpperCase()}
+            </span>
+          </div>
+
+          <p style={{ fontFamily: FONT.body, fontSize: '15px', color: STONE.inkSoft, lineHeight: 1.8, flex: 1 }}>
+            {member.bio}
+          </p>
+        </div>
+      </div>
+    </StonePlate>
   )
 }
 
 export default function AboutUs() {
   return (
-    <section id="zespol" className="py-28" style={{ backgroundColor: '#F5F3EF' }}>
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="zespol" className="relative py-28 overflow-hidden" style={{ backgroundColor: STONE.travertine, ...grout(84, 0.16) }}>
+      <div className="relative max-w-7xl mx-auto px-6">
         <Reveal className="mb-14">
           <SectionLabel number="04" label="ZAŁOŻYCIEL" />
-          <h2 style={{ fontFamily: 'var(--font-playfair)', fontSize: 'clamp(36px, 5vw, 48px)', fontWeight: 700, color: '#1A2B47', maxWidth: 600 }}>
+          <h2 className="carved" style={{ ...CARVED, fontSize: 'clamp(21px, 3.1vw, 32px)', color: STONE.ink, maxWidth: 820, lineHeight: 1.2 }}>
             Nie sprzedajemy narzędzi.{' '}
-            <span style={{ fontStyle: 'italic', color: '#C9A84C' }}>Wdrażamy systemy które działają.</span>
+            <span style={{ color: STONE.moss }}>Wdrażamy systemy, które działają.</span>
           </h2>
         </Reveal>
 
         <div className="flex justify-center">
-          <div className="w-full max-w-xl">
-            {TEAM.map((member, i) => (
-              <TeamCard key={member.name} member={member} index={i} />
+          <div className="relative w-full max-w-2xl">
+            {/* Bluszcz wspina się po rogu zdjęcia — jedyne miejsce na
+                płycie, gdzie liście nie wchodzą na tekst */}
+            <div className="absolute pointer-events-none origin-bottom-left scale-[0.5] sm:scale-75 lg:scale-90"
+              style={{ bottom: -34, left: -40, zIndex: 3 }}>
+              <Vine size={190} flipY delay={0.2} />
+            </div>
+            {TEAM.map((member) => (
+              <Reveal key={member.name}><TeamCard member={member} /></Reveal>
             ))}
           </div>
         </div>

@@ -43,3 +43,15 @@ next-env.d.ts
 # Python cache (ui-ux-pro-max skill)
 __pycache__/
 *.pyc
+
+# Prywatne dokumenty firmowe — repo jest publiczne
+Plan_biznesowy_Dolar-Systems.docx
+Plan_dzialania_kalendarz.ics
+
+# Luzne media w katalogu glownym (duplikaty plikow z public/)
+/heroorigami.mov
+/Marek Rybka.png
+/dolar (2).png
+
+# Lokalne skille Claude Code
+.claude/skills/

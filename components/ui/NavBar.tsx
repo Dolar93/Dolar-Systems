@@ -1,14 +1,55 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
+import { STONE, FONT, CARVED } from './stone'
+
+const LOGO = '/logo-dolar-overgrown.png'
+const LOGO_FALLBACK = '/logo-dolar-metatron.png'
+
+/* Zarośnięty betonowy dolar. Zwykły <img>, nie next/image, żeby brak
+   pliku degradował się do starego logo zamiast zostawiać dziurę.
+   Samo onError nie wystarcza: obrazek jest renderowany po stronie
+   serwera, więc błąd ładowania potrafi polecieć zanim React zdąży
+   podpiąć handler — stąd dodatkowe sprawdzenie po zamontowaniu. */
+function Logo() {
+  const [src, setSrc] = useState(LOGO)
+  const ref = useRef<HTMLImageElement>(null)
+
+  useEffect(() => {
+    const img = ref.current
+    if (img && img.complete && img.naturalWidth === 0) setSrc(LOGO_FALLBACK)
+  }, [])
+
+  return (
+    /* Znak jest pionowy (442×565) — wymiary trzymają proporcję,
+       żeby nie rozpychał 64-pikselowego paska ani nie skakał przy ładowaniu */
+    <img
+      ref={ref}
+      src={src}
+      alt=""
+      width={33}
+      height={42}
+      style={{ height: 42, width: 'auto', objectFit: 'contain', display: 'block' }}
+      onError={() => setSrc(LOGO_FALLBACK)}
+    />
+  )
+}
 
 const NAV_LINKS = [
-  { href: '/#zakres', label: 'Zakres' },
+  { href: '/#zakres', label: 'Systemy' },
   { href: '/#realizacje', label: 'Realizacje' },
   { href: '/#zespol', label: 'Zespół' },
   { href: '/#kontakt', label: 'Kontakt' },
 ]
+
+const linkSt: React.CSSProperties = {
+  fontFamily: FONT.mono,
+  fontSize: '11px',
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  color: STONE.inkSoft,
+}
 
 export default function NavBar() {
   const [hidden, setHidden] = useState(false)
@@ -32,14 +73,12 @@ export default function NavBar() {
       variants={{ visible: { y: 0 }, hidden: { y: '-100%' } }}
       animate={hidden ? 'hidden' : 'visible'}
       transition={{ duration: 0.28, ease: 'easeInOut' }}
-      className="fixed top-0 left-0 right-0 z-50"
+      className="fixed top-0 left-0 right-0 z-50 stone-light"
       style={{
-        backgroundColor: scrolled ? 'rgba(245,243,239,0.94)' : '#F5F3EF',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: '1px solid rgba(26,43,71,0.10)',
-        boxShadow: scrolled ? '0 2px 16px rgba(26,43,71,0.06)' : 'none',
-        transition: 'background-color 0.3s, box-shadow 0.3s',
+        /* Pasek nawigacji to płyta krawężnikowa — mech w dolnej fudze */
+        borderBottom: `2px solid ${scrolled ? STONE.moss : 'rgba(51,71,28,0.30)'}`,
+        boxShadow: scrolled ? '0 4px 18px rgba(58,50,34,0.14)' : 'none',
+        transition: 'border-color 0.3s, box-shadow 0.3s',
       }}
     >
       <nav
@@ -49,35 +88,41 @@ export default function NavBar() {
         {/* Logo */}
         <a
           href="#"
-          className="select-none"
-          style={{
-            fontFamily: 'var(--font-playfair)',
-            color: '#1A2B47',
-            fontSize: '19px',
-            fontWeight: 700,
-            letterSpacing: '-0.01em',
-          }}
+          className="select-none flex items-center gap-2.5"
           aria-label="Dolar Systems — strona główna"
         >
-          Dolar<span style={{ color: '#C9A84C' }}>_</span>Systems
+          <Logo />
+          <span
+            className="carved"
+            style={{
+              ...CARVED,
+              fontVariationSettings: '"wdth" 112, "wght" 700',
+              color: STONE.ink,
+              fontSize: '17px',
+              letterSpacing: '-0.005em',
+            }}
+          >
+            Dolar<span style={{ color: STONE.moss }}>_</span>Systems
+          </span>
         </a>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-8" role="list">
+        <div className="hidden lg:flex items-center gap-8" role="list">
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
               role="listitem"
-              className="text-sm relative group transition-colors duration-200"
-              style={{ fontFamily: 'var(--font-dm)', color: '#3D4F6B' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#1A2B47')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#3D4F6B')}
+              className="relative group transition-colors duration-200"
+              style={linkSt}
+              onMouseEnter={(e) => (e.currentTarget.style.color = STONE.ink)}
+              onMouseLeave={(e) => (e.currentTarget.style.color = STONE.inkSoft)}
             >
               {link.label}
+              {/* Mech wrasta pod linkiem */}
               <span
-                className="absolute -bottom-0.5 left-0 w-0 group-hover:w-full transition-all duration-200"
-                style={{ height: '1px', backgroundColor: '#C9A84C' }}
+                className="absolute -bottom-1.5 left-0 w-0 group-hover:w-full transition-all duration-300"
+                style={{ height: '2px', backgroundColor: STONE.moss }}
               />
             </a>
           ))}
@@ -86,32 +131,28 @@ export default function NavBar() {
         {/* CTA */}
         <a
           href="/#kontakt"
-          className="hidden md:inline-flex items-center text-sm px-5 py-2.5 font-medium transition-all duration-200 cursor-pointer"
+          className="hidden lg:inline-flex items-center cursor-pointer transition-colors duration-200"
           style={{
-            fontFamily: 'var(--font-dm)',
-            backgroundColor: '#1A2B47',
-            color: '#F5F3EF',
-            borderRadius: '4px',
+            ...linkSt,
+            fontWeight: 600,
+            color: STONE.light,
+            backgroundColor: STONE.moss,
+            padding: '11px 20px',
+            boxShadow: `0 3px 0 ${STONE.mossDeep}`,
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#C9A84C'
-            e.currentTarget.style.color = '#1A2B47'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#1A2B47'
-            e.currentTarget.style.color = '#F5F3EF'
-          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = STONE.mossDeep }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = STONE.moss }}
         >
           Bezpłatna analiza
         </a>
 
         {/* Hamburger */}
         <button
-          className="md:hidden p-2 cursor-pointer"
+          className="lg:hidden p-2 cursor-pointer"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? 'Zamknij menu' : 'Otwórz menu'}
           aria-expanded={mobileOpen}
-          style={{ color: '#1A2B47' }}
+          style={{ color: STONE.ink }}
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -124,16 +165,16 @@ export default function NavBar() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
-          className="md:hidden px-6 pb-6"
-          style={{ borderTop: '1px solid rgba(26,43,71,0.10)', backgroundColor: '#F5F3EF' }}
+          className="lg:hidden px-6 pb-6 stone-light"
+          style={{ borderTop: '1px solid rgba(51,71,28,0.20)' }}
         >
           <div className="flex flex-col gap-1 pt-4">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm py-3 border-b"
-                style={{ fontFamily: 'var(--font-dm)', color: '#3D4F6B', borderColor: 'rgba(26,43,71,0.08)' }}
+                className="py-3.5"
+                style={{ ...linkSt, fontSize: '12px', borderBottom: '1px solid rgba(51,71,28,0.14)' }}
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
@@ -141,8 +182,12 @@ export default function NavBar() {
             ))}
             <a
               href="/#kontakt"
-              className="text-sm px-5 py-3 text-center mt-4 font-medium"
-              style={{ fontFamily: 'var(--font-dm)', backgroundColor: '#1A2B47', color: '#F5F3EF', borderRadius: '4px' }}
+              className="px-5 py-4 text-center mt-4"
+              style={{
+                ...linkSt, fontSize: '12px', fontWeight: 600,
+                color: STONE.light, backgroundColor: STONE.moss,
+                boxShadow: `0 3px 0 ${STONE.mossDeep}`,
+              }}
               onClick={() => setMobileOpen(false)}
             >
               Bezpłatna analiza

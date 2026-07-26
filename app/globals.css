@@ -1,17 +1,55 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg:       #F5F3EF;
-  --color-card:     #FAFAF8;
-  --color-dark:     #EEEAE3;
-  --color-primary:  #1A2B47;
-  --color-secondary:#3D4F6B;
-  --color-muted:    #8A9AB5;
-  --color-gold:     #C9A84C;
+  --color-bg:       #E7E1D3;
+  --color-card:     #F2EDE2;
+  --color-dark:     #D8D1BF;
+  --color-primary:  #3A404C;
+  --color-secondary:#4F5A45;
+  --color-muted:    #5A6647;
+  --color-moss:     #4F6B28;
 
-  --font-heading: var(--font-playfair), Georgia, serif;
-  --font-body:    var(--font-dm), system-ui, sans-serif;
+  --font-heading: var(--font-archivo), Impact, sans-serif;
+  --font-body:    var(--font-inter-tight), system-ui, sans-serif;
   --font-mono:    var(--font-ibm), ui-monospace, monospace;
+}
+
+/* ── Stone & moss palette — "Ogród na siatce" ────────────────────
+   Trawertyn, grafitowy łupek, mech i woda. Bez granatu, bez złota. */
+:root {
+  --travertine:       #E7E1D3;
+  --travertine-light: #F2EDE2;
+  --travertine-deep:  #D8D1BF;
+  --slate:            #3A404C;
+  --slate-soft:       #4A5260;
+  --moss:             #4F6B28;
+  --moss-deep:        #33471C;
+  --lichen:           #A8B88C;
+  --water:            #6E8290;
+  --water-deep:       #3E4E5E;
+}
+
+/* Litery wykute w płycie — ciemny znak, światło od dołu krawędzi */
+.carved {
+  text-shadow: 0 1px 0 rgba(255,255,255,0.72), 0 -1px 1px rgba(58,64,76,0.28);
+}
+/* Ten sam efekt na ciemnym łupku */
+.carved-dark {
+  text-shadow: 0 1px 0 rgba(0,0,0,0.45), 0 -1px 0 rgba(255,255,255,0.10);
+}
+
+/* Trawertyn ma poziome żyłkowanie — dwie subtelne warstwy prążków */
+.stone {
+  background-color: var(--travertine);
+  background-image:
+    repeating-linear-gradient(94deg, rgba(88,74,52,0.030) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(0deg,  rgba(255,255,255,0.22) 0 1px, transparent 1px 6px);
+}
+.stone-light {
+  background-color: var(--travertine-light);
+  background-image:
+    repeating-linear-gradient(94deg, rgba(88,74,52,0.024) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(0deg,  rgba(255,255,255,0.28) 0 1px, transparent 1px 6px);
 }
 
 /* ── Brand colours ──────────────────────────────────────────────── */
@@ -32,9 +70,9 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: #F5F3EF;
-  color: #1A2B47;
-  font-family: var(--font-dm), system-ui, sans-serif;
+  background-color: #E7E1D3;
+  color: #3A404C;
+  font-family: var(--font-inter-tight), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -51,14 +89,14 @@ body::before {
   background-size: 180px 180px;
 }
 
-::selection { background: #1A2B47; color: #F5F3EF; }
+::selection { background: #4F6B28; color: #F2EDE2; }
 
-::-webkit-scrollbar        { width: 4px; }
-::-webkit-scrollbar-track  { background: #EEEAE3; }
-::-webkit-scrollbar-thumb  { background: #8A9AB5; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #C9A84C; }
+::-webkit-scrollbar        { width: 5px; }
+::-webkit-scrollbar-track  { background: #D8D1BF; }
+::-webkit-scrollbar-thumb  { background: #4F6B28; }
+::-webkit-scrollbar-thumb:hover { background: #33471C; }
 
-:focus-visible { outline: 2px solid #C9A84C; outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--moss); outline-offset: 2px; }
 
 /* ── Paper craft utilities ──────────────────────────────────────── */
 .paper-texture {
