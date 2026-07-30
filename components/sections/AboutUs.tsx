@@ -1,7 +1,6 @@
 'use client'
 import SectionLabel from '@/components/ui/SectionLabel'
 import StonePlate from '@/components/ui/StonePlate'
-import Vine from '@/components/ui/Vine'
 import { Reveal } from '@/components/animations/reveal'
 import { STONE, FONT, CARVED, grout } from '@/components/ui/stone'
 
@@ -76,12 +75,6 @@ export default function AboutUs() {
 
         <div className="flex justify-center">
           <div className="relative w-full max-w-2xl">
-            {/* Pojedynczy pęd opada wzdłuż krawędzi zdjęcia — jedyne
-                miejsce na płycie, gdzie liście nie wchodzą na tekst */}
-            <div className="absolute pointer-events-none hidden sm:block"
-              style={{ top: -28, left: -46, zIndex: 3 }}>
-              <Vine variant="hanging" size={92} delay={0.2} />
-            </div>
             {TEAM.map((member) => (
               <Reveal key={member.name}><TeamCard member={member} /></Reveal>
             ))}
