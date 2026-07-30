@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import Courtyard from '@/components/ui/Courtyard'
 import Vine from '@/components/ui/Vine'
+import RuneFireSprite from '@/components/ui/RuneFireSprite'
 import { STONE, FONT, CARVED } from '@/components/ui/stone'
 
 const BODY = FONT.body
@@ -101,11 +102,35 @@ function Marker({ val, label, delay }: { val: string; label: string; delay: numb
 /* ── Hero ───────────────────────────────────────────────────────── */
 export default function Hero() {
   const reduced = useReducedMotion()
+  const [easterEggIgnited, setEasterEggIgnited] = useState(false)
   const ease = [0.22, 1, 0.36, 1] as const
 
   return (
-    <section id="hero" className="relative overflow-hidden" aria-label="Hero">
-      <Courtyard />
+    <section
+      id="hero"
+      className="relative overflow-hidden"
+      aria-label="Hero"
+      data-easter-egg-active={easterEggIgnited}
+    >
+      <Courtyard onIgnite={() => setEasterEggIgnited(true)} />
+
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        initial={false}
+        animate={{ opacity: easterEggIgnited ? [0.26, 0.46, 0.34] : 0 }}
+        transition={easterEggIgnited && !reduced
+          ? { duration: 2.4, repeat: Infinity, ease: 'easeInOut' }
+          : { duration: reduced ? 0 : 0.45 }}
+        style={{
+          zIndex: 1,
+          background: `
+            radial-gradient(circle at 88% 22%, rgba(141,255,108,0.50), transparent 25%),
+            radial-gradient(circle at 12% 71%, rgba(118,255,88,0.42), transparent 27%)
+          `,
+          mixBlendMode: 'screen',
+        }}
+      />
 
       <div className="relative max-w-5xl mx-auto px-6 pt-36 pb-24" style={{ zIndex: 10 }}>
         {/* ── Płyta z treścią, wyniesiona ponad bruk ── */}
@@ -130,7 +155,36 @@ export default function Hero() {
           <Corner style={{ bottom: 6, left: 6, transform: 'scaleY(-1)' }} />
           <Corner style={{ bottom: 6, right: 6, transform: 'scale(-1,-1)' }} />
 
-          <div className="relative flex flex-col items-center text-center">
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -inset-6"
+            initial={false}
+            animate={{ opacity: easterEggIgnited ? [0.34, 0.63, 0.42] : 0 }}
+            transition={easterEggIgnited && !reduced
+              ? { duration: 1.65, repeat: Infinity, ease: 'easeInOut' }
+              : { duration: reduced ? 0 : 0.38 }}
+            style={{
+              zIndex: 1,
+              background: `
+                radial-gradient(circle at 96% 5%, rgba(175,255,140,0.68), transparent 29%),
+                radial-gradient(circle at 3% 98%, rgba(140,255,105,0.57), transparent 30%)
+              `,
+              mixBlendMode: 'screen',
+            }}
+          />
+
+          <RuneFireSprite
+            active={easterEggIgnited}
+            className="absolute right-[-64px] top-[-160px] h-[250px] w-[250px]"
+            style={{ zIndex: 2, filter: 'saturate(1.85) brightness(0.94) drop-shadow(0 0 18px rgba(112,255,83,0.65))' }}
+          />
+          <RuneFireSprite
+            active={easterEggIgnited}
+            className="absolute bottom-[-28px] left-[-112px] hidden h-[226px] w-[226px] sm:block"
+            style={{ zIndex: 2, filter: 'saturate(1.85) brightness(0.94) drop-shadow(0 0 18px rgba(112,255,83,0.65))', transform: 'scaleX(-1)' }}
+          />
+
+          <div className="relative flex flex-col items-center text-center" style={{ zIndex: 3 }}>
             <motion.div
               initial={reduced ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -204,11 +258,11 @@ export default function Hero() {
               która nie respektuje siatki */}
           <div
             className="absolute pointer-events-none origin-top-right scale-[0.46] sm:scale-75 lg:scale-100"
-            style={{ top: -64, right: -58, zIndex: 2 }}
+            style={{ top: -64, right: -58, zIndex: 4 }}
           >
             <Vine size={236} flipX delay={0.7} />
           </div>
-          <div className="absolute pointer-events-none hidden sm:block" style={{ bottom: -60, left: -56, zIndex: 2 }}>
+          <div className="absolute pointer-events-none hidden sm:block" style={{ bottom: -60, left: -56, zIndex: 4 }}>
             <Vine size={198} flipY delay={1.0} />
           </div>
         </motion.div>

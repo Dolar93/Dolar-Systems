@@ -1,0 +1,46 @@
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║          CHAT WIDGET — EMBED SNIPPET                    ║
+  ║                                                          ║
+  ║  1. Upload widget.html to your server (or any host)     ║
+  ║  2. Copy the iframe tag below and paste it into your    ║
+  ║     page just before the closing </body> tag            ║
+  ╚══════════════════════════════════════════════════════════╝
+-->
+
+<!-- Paste this before </body> — change the src path to match where you host widget.html -->
+<iframe src="/widget.html" style="position:fixed;bottom:0;right:0;width:400px;height:660px;border:none;z-index:2147483647;" title="Chat" allow="clipboard-write"></iframe>
+
+
+<!--
+  ════════════════════════════════════════════════════════════
+  ALTERNATIVE: No hosting required — inline the widget directly
+  ════════════════════════════════════════════════════════════
+
+  If you don't want to host a separate file, open widget.html,
+  copy everything between <style>...</style> into your page's
+  <head>, then copy the <div id="cw-root">...</div> block and
+  both <script> blocks into your page's <body>.
+
+  ════════════════════════════════════════════════════════════
+  HOSTING OPTIONS (free)
+  ════════════════════════════════════════════════════════════
+
+  • GitHub Pages     → push widget.html to a repo, enable Pages
+  • Netlify Drop     → drag widget.html to netlify.com/drop
+  • Vercel           → `vercel --name my-widget` in the folder
+  • Any static host  → upload widget.html, copy the public URL
+
+  Then change the iframe src= to your public URL, e.g.:
+    src="https://mysite.netlify.app/widget.html"
+
+  ════════════════════════════════════════════════════════════
+  NOTES
+  ════════════════════════════════════════════════════════════
+
+  • The iframe covers the 400×660 bottom-right corner of your
+    page. This is normal — it's how all chat widgets work.
+  • Your API key is visible in widget.html's source. For a
+    public site, consider proxying requests through your own
+    server endpoint to keep the key server-side.
+-->

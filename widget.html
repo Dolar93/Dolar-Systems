@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Widget</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: transparent; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+    /* ── Widget root ── */
+    #cw-root {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      z-index: 999999;
+    }
+
+    /* ── Floating bubble button ── */
+    #cw-bubble {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.45);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.2s ease;
+      flex-shrink: 0;
+      outline: none;
+    }
+    #cw-bubble:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 24px rgba(37, 99, 235, 0.55);
+    }
+    #cw-bubble:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.5);
+      outline-offset: 3px;
+    }
+    #cw-bubble svg { pointer-events: none; transition: opacity 0.15s ease; }
+
+    /* ── Chat window ── */
+    #cw-window {
+      width: 360px;
+      height: 520px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform-origin: bottom right;
+      transform: scale(0.8) translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  opacity 0.2s ease;
+    }
+    #cw-window.open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Header ── */
+    #cw-header {
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: #fff;
+      padding: 14px 16px 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    #cw-header-info { display: flex; align-items: center; gap: 11px; }
+    #cw-header-avatar {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    #cw-header-name { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+    #cw-header-status {
+      font-size: 11.5px;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1px;
+    }
+    #cw-status-dot {
+      width: 6px;
+      height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    #cw-close-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      padding: 6px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      outline: none;
+    }
+    #cw-close-btn:hover { background: rgba(255, 255, 255, 0.28); }
+    #cw-close-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.6); }
+
+    /* ── Messages ── */
+    #cw-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+    #cw-messages::-webkit-scrollbar { width: 4px; }
+    #cw-messages::-webkit-scrollbar-track { background: transparent; }
+    #cw-messages::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 2px;
+    }
+
+    /* ── Message rows ── */
+    .cw-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+      animation: cw-in 0.22s ease forwards;
+    }
+    @keyframes cw-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .cw-row.user { flex-direction: row-reverse; align-self: flex-end; max-width: 86%; }
+    .cw-row.bot  { align-self: flex-start; max-width: 86%; }
+
+    .cw-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+
+    .cw-bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .cw-row.bot  .cw-bubble {
+      background: #f1f5f9;
+      color: #1e293b;
+      border-bottom-left-radius: 4px;
+    }
+    .cw-row.user .cw-bubble {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .cw-row.error .cw-bubble {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      border-bottom-left-radius: 4px;
+    }
+
+    /* ── Typing indicator ── */
+    #cw-typing {
+      display: none;
+      align-self: flex-start;
+      align-items: flex-end;
+      gap: 7px;
+      animation: cw-in 0.22s ease forwards;
+    }
+    #cw-typing.show { display: flex; }
+    .cw-typing-dots {
+      background: #f1f5f9;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      padding: 12px 16px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .cw-dot {
+      width: 7px;
+      height: 7px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: cw-bounce 1.3s infinite ease-in-out both;
+    }
+    .cw-dot:nth-child(2) { animation-delay: 0.16s; }
+    .cw-dot:nth-child(3) { animation-delay: 0.32s; }
+    @keyframes cw-bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30%            { transform: translateY(-7px); }
+    }
+
+    /* ── Input footer ── */
+    #cw-footer {
+      padding: 11px 12px 13px;
+      border-top: 1px solid #f1f5f9;
+      background: #fff;
+      flex-shrink: 0;
+    }
+    #cw-form {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    #cw-input {
+      flex: 1;
+      min-height: 40px;
+      max-height: 120px;
+      padding: 10px 13px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      line-height: 1.4;
+      resize: none;
+      outline: none;
+      overflow-y: auto;
+      transition: border-color 0.18s ease;
+      color: #1e293b;
+    }
+    #cw-input:focus { border-color: #2563eb; }
+    #cw-input::placeholder { color: #94a3b8; }
+    #cw-send {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.15s ease, transform 0.12s ease;
+      outline: none;
+    }
+    #cw-send:hover:not(:disabled) { opacity: 0.88; }
+    #cw-send:active:not(:disabled) { transform: scale(0.92); }
+    #cw-send:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+    #cw-send:focus-visible { outline: 3px solid rgba(37,99,235,0.4); }
+
+    /* ── Mobile responsive ── */
+    @media (max-width: 480px) {
+      #cw-root { bottom: 16px; right: 16px; }
+      #cw-window {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 88vh;
+        border-radius: 20px 20px 0 0;
+        transform-origin: bottom center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════════════════════╗
+     ║              CONFIGURATION — EDIT HERE                 ║
+     ╚══════════════════════════════════════════════════════════╝
+
+     ⚠️  SECURITY WARNING
+     Your API key is embedded in this file and VISIBLE to anyone
+     who views the page source. This is fine for personal use or
+     internal tools. For a public website, proxy requests through
+     your own server instead of calling Anthropic directly.      -->
+
+<script>
+  // Your Anthropic API key — get one at https://console.anthropic.com
+  const CW_API_KEY = 'sk-ant-YOUR_KEY_HERE';
+
+  // Customize the bot's personality, knowledge, and tone:
+  const CW_SYSTEM_PROMPT = `You are a friendly and knowledgeable assistant. \
+Answer questions clearly and concisely. \
+If you're unsure about something, say so honestly. \
+Keep responses focused and helpful.`;
+
+  // Name displayed in the widget header:
+  const CW_BOT_NAME = 'Assistant';
+
+  // First message shown when the user opens the chat:
+  const CW_WELCOME_MESSAGE = `Hi there! 👋 How can I help you today?`;
+
+  // Model to use — claude-sonnet-4-6 is fast and capable
+  // Other options: claude-opus-4-8 (most powerful), claude-haiku-4-5 (cheapest)
+  const CW_MODEL = 'claude-sonnet-4-6';
+
+  // Max tokens per response (increase for longer answers)
+  const CW_MAX_TOKENS = 1024;
+</script>
+
+<!-- ── Widget markup ── -->
+<div id="cw-root">
+
+  <!-- Chat window -->
+  <div id="cw-window" role="dialog" aria-modal="true" aria-label="Chat">
+
+    <div id="cw-header">
+      <div id="cw-header-info">
+        <div id="cw-header-avatar">🤖</div>
+        <div>
+          <div id="cw-header-name"></div>
+          <div id="cw-header-status">
+            <span id="cw-status-dot"></span>
+            <span>Online</span>
+          </div>
+        </div>
+      </div>
+      <button id="cw-close-btn" aria-label="Close chat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="cw-messages" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+    <!-- Typing indicator lives here, gets moved into messages -->
+    <div id="cw-typing" role="status" aria-label="Assistant is typing">
+      <div class="cw-avatar">🤖</div>
+      <div class="cw-typing-dots">
+        <div class="cw-dot"></div>
+        <div class="cw-dot"></div>
+        <div class="cw-dot"></div>
+      </div>
+    </div>
+
+    <div id="cw-footer">
+      <form id="cw-form">
+        <textarea
+          id="cw-input"
+          placeholder="Type a message…"
+          rows="1"
+          aria-label="Message"
+          autocomplete="off"
+        ></textarea>
+        <button id="cw-send" type="submit" disabled aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Floating bubble -->
+  <button id="cw-bubble" aria-label="Open chat" aria-expanded="false">
+    <!-- Chat icon (shown when closed) -->
+    <svg id="cw-icon-open" width="26" height="26" viewBox="0 0 24 24" fill="white">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+    </svg>
+    <!-- Close icon (shown when open) -->
+    <svg id="cw-icon-close" width="22" height="22" viewBox="0 0 24 24" fill="white" style="display:none;">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    </svg>
+  </button>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── DOM refs ── */
+  const root       = document.getElementById('cw-root');
+  const bubbleBtn  = document.getElementById('cw-bubble');
+  const chatWin    = document.getElementById('cw-window');
+  const closeBtn   = document.getElementById('cw-close-btn');
+  const msgList    = document.getElementById('cw-messages');
+  const typingEl   = document.getElementById('cw-typing');
+  const form       = document.getElementById('cw-form');
+  const inputEl    = document.getElementById('cw-input');
+  const sendBtn    = document.getElementById('cw-send');
+  const headerName = document.getElementById('cw-header-name');
+  const iconOpen   = document.getElementById('cw-icon-open');
+  const iconClose  = document.getElementById('cw-icon-close');
+
+  /* ── Apply config ── */
+  headerName.textContent = CW_BOT_NAME;
+
+  /* ── State ── */
+  let isOpen    = false;
+  let isBusy    = false;
+  let history   = [];   // [{role:'user'|'assistant', content: string}]
+  let welcomed  = false;
+
+  /* ─────────────────── Open / Close ─────────────────── */
+  function openChat() {
+    isOpen = true;
+    chatWin.classList.add('open');
+    bubbleBtn.setAttribute('aria-expanded', 'true');
+    bubbleBtn.setAttribute('aria-label', 'Close chat');
+    iconOpen.style.display  = 'none';
+    iconClose.style.display = 'block';
+    if (!welcomed) {
+      welcomed = true;
+      appendMessage('bot', CW_WELCOME_MESSAGE);
+    }
+    setTimeout(() => inputEl.focus(), 260);
+  }
+
+  function closeChat() {
+    isOpen = false;
+    chatWin.classList.remove('open');
+    bubbleBtn.setAttribute('aria-expanded', 'false');
+    bubbleBtn.setAttribute('aria-label', 'Open chat');
+    iconOpen.style.display  = 'block';
+    iconClose.style.display = 'none';
+  }
+
+  bubbleBtn.addEventListener('click', () => isOpen ? closeChat() : openChat());
+  closeBtn.addEventListener('click', closeChat);
+
+  /* Close on Escape */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) closeChat();
+  });
+
+  /* ─────────────────── Input handling ─────────────────── */
+  inputEl.addEventListener('input', function () {
+    /* auto-resize */
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    sendBtn.disabled = !this.value.trim() || isBusy;
+  });
+
+  /* Enter to send, Shift+Enter for newline */
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!sendBtn.disabled) send();
+    }
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!sendBtn.disabled) send();
+  });
+
+  /* ─────────────────── Render messages ─────────────────── */
+  function appendMessage(role, text) {
+    const row = document.createElement('div');
+    row.className = 'cw-row ' + (role === 'user' ? 'user' : role === 'error' ? 'bot error' : 'bot');
+
+    if (role !== 'user') {
+      const av = document.createElement('div');
+      av.className = 'cw-avatar';
+      av.textContent = '🤖';
+      row.appendChild(av);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'cw-bubble';
+    bubble.textContent = text;
+    if (role === 'error') row.classList.add('error');
+    row.appendChild(bubble);
+
+    msgList.appendChild(row);
+    scrollToBottom();
+    return row;
+  }
+
+  function scrollToBottom() {
+    msgList.scrollTop = msgList.scrollHeight;
+  }
+
+  /* ─────────────────── Typing indicator ─────────────────── */
+  function showTyping() {
+    isBusy = true;
+    sendBtn.disabled = true;
+    typingEl.classList.add('show');
+    msgList.appendChild(typingEl);
+    scrollToBottom();
+  }
+
+  function hideTyping() {
+    isBusy = false;
+    typingEl.classList.remove('show');
+    sendBtn.disabled = !inputEl.value.trim();
+  }
+
+  /* ─────────────────── API call ─────────────────── */
+  async function send() {
+    const text = inputEl.value.trim();
+    if (!text || isBusy) return;
+
+    /* Reset input */
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    appendMessage('user', text);
+    history.push({ role: 'user', content: text });
+    showTyping();
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key':                           CW_API_KEY,
+          'anthropic-version':                   '2023-06-01',
+          'content-type':                        'application/json',
+          'anthropic-dangerous-request-options': 'allow-browser',
+        },
+        body: JSON.stringify({
+          model:      CW_MODEL,
+          max_tokens: CW_MAX_TOKENS,
+          system:     CW_SYSTEM_PROMPT,
+          messages:   history,
+        }),
+      });
+
+      if (!res.ok) {
+        let msg = `HTTP ${res.status}`;
+        try { const j = await res.json(); msg = j.error?.message || msg; } catch (_) {}
+        throw new Error(msg);
+      }
+
+      const data  = await res.json();
+      const reply = data.content?.[0]?.text ?? '(empty response)';
+
+      history.push({ role: 'assistant', content: reply });
+      hideTyping();
+      appendMessage('bot', reply);
+
+    } catch (err) {
+      hideTyping();
+      appendMessage('error', '⚠️ ' + err.message);
+    }
+  }
+
+})();
+</script>
+
+</body>
+</html>
